@@ -28,6 +28,6 @@ while True:
     if motor_num.isdigit() and 0 < int(motor_num) <= 6:
         # Send the motor number to the Arduino
         ser.write(motor_num.encode())
-        time.sleep(5)
+        time.sleep(17)
     else:
         print("Invalid input! Please enter a number between 1 and 6.")
