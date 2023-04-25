@@ -40,31 +40,48 @@ else:
 # Retrieve the item's position and orientation
 ref_pose = ref_frame.Pose()
 
+#define radius and angular spacing between dispenser positions
+radius = 500
+
+top_angle = 0 * robomath.pi/180
+fuse_angle = 30 * robomath.pi/180
+pcb_angle = 60 * robomath.pi/180
+bottom_angle = 90 * robomath.pi/180
+
 
 # Change the pose of the item
-bottom_pos = [-100, 450, 0]    # x, y, z coordinates in mm
+bottom_pos = [robomath.cos(bottom_angle)*radius, robomath.sin(bottom_angle)*radius, 0]    # x, y, z coordinates in mm
 bottom_orient = robomath.atan2(bottom_pos[1], bottom_pos[0])-(90*robomath.pi/180)  #-robomath.pi/2
 
-pcb_pos = [180, 400, 0]
+pcb_pos = [robomath.cos(pcb_angle)*radius, robomath.sin(pcb_angle)*radius, 0]
 pcb_orient = robomath.atan2(pcb_pos[1], pcb_pos[0])-(90*robomath.pi/180) #-robomath.pi/2 180+
 
-fuse_pos = [350, 400, 100] 
+fuse_pos = [robomath.cos(fuse_angle)*radius, robomath.sin(fuse_angle)*radius, 0] 
 fuse_orient = robomath.atan2(fuse_pos[1], fuse_pos[0])-(90*robomath.pi/180) #-robomath.pi/2
 
-top_pos = [550, 300, 0]
+top_pos = [robomath.cos(top_angle)*radius, robomath.sin(top_angle)*radius, 0]
 top_orient = robomath.atan2(top_pos[1], top_pos[0])-(90*robomath.pi/180) #-robomath.pi/2
 
 
 bottom_pose = ref_pose * robomath.transl(bottom_pos[0], bottom_pos[1], bottom_pos[2]) * robomath.rotz(bottom_orient) #robomath.TxyzRxyz_2_Pose(bottom_pos + [0,0,0]) 
+bottom_pose = bottom_pose * robomath.transl(31,66, 0)
+
 top_pose = ref_pose * robomath.transl(top_pos[0], top_pos[1], top_pos[2]) * robomath.rotz(top_orient) #* robomath.rotz(-robomath.pi/4) #robomath.TxyzRxyz_2_Pose(top_pos + [0,0, 0]) * robomath.rotz(-robomath.pi/4) #-robomath.pi/4])
+top_pose = top_pose * robomath.transl(31,66, 0)
+
 fuse_pose = ref_pose * robomath.transl(fuse_pos[0], fuse_pos[1], fuse_pos[2]) * robomath.rotz(fuse_orient)
+fuse_pose = fuse_pose * robomath.transl(13.5, 40.3, 0)
+
 pcb_pose = ref_pose * robomath.transl(pcb_pos[0], pcb_pos[1], pcb_pos[2]) * robomath.rotz(pcb_orient) #robomath.TxyzRxyz_2_Pose(pcb_pos + [0,0, 0])
+pcb_pose = pcb_pose * robomath.transl(20.6, 42.5, 0)
+
 
 # update items' pose
 bottom_dispenser.setPose(bottom_pose)           
 top_dispenser.setPose(top_pose)
 fuse_dispenser.setPose(fuse_pose)
 pcb_dispenser.setPose(pcb_pose)
+
 
 #Sets an offset from target to make an approach and leave point
 #Note that it does not account for the angle of 22 degrees e.g. does not
