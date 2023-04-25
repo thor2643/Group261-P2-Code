@@ -11,12 +11,12 @@ const int num_Stepper_Motors = 6;
 
 // Define the pins for each stepper motor
 int motorPins[num_Stepper_Motors][4] = {
-  {8, 9, 10, 11},
-  {12, 13, 14, 15},
-  {16, 17, 18, 19},
-  {20, 21, 22, 23},
-  {24, 25, 26, 27},
-  {28, 29, 30, 31}
+  {8, 10, 9, 11},
+  {12, 14, 13, 15},
+  {16, 18, 17, 19},
+  {20, 22, 21, 23},
+  {24, 26, 25, 27},
+  {28, 30, 29, 31}
 };
 
 // Define the stepper motor objects
@@ -39,9 +39,11 @@ void loop() {
   if (Serial.available()) {
     int motor_Num = Serial.parseInt();
     if (motor_Num > 0 && motor_Num < 7) {
-      stepperMotors[motor_Num - 1].setSpeed(5);
-      stepperMotors[motor_Num - 1].step(steps_Per_Revolution);
-      delay(1000); 
+      stepperMotors[motor_Num - 1].setSpeed(15);
+      stepperMotors[motor_Num - 1].step(steps_Per_Revolution*2 );
+      delay(1000);  
+      stepperMotors[motor_Num - 1].step(-steps_Per_Revolution * 2);
+      delay(1000);  
 
     }
   }
