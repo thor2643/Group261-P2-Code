@@ -1,4 +1,5 @@
 import serial
+import time
 
 # Set up the serial connection
 ser = serial.Serial()
@@ -20,8 +21,13 @@ while True:
         ser.open()
         break
 
-# Get input from the user
-motor_num = input("Enter the motor number (1-6): ")
 
-# Send the motor number to the Arduino
-ser.write(motor_num.encode())
+while True:
+    motor_num = 0
+    # Get input from the user
+    motor_num = int(input("Enter the motor number (1-6): "))
+    if (motor_num > 0):
+        # Send the motor number to the Arduino
+        ser.write(motor_num.encode())
+        time.sleep(5)
+
