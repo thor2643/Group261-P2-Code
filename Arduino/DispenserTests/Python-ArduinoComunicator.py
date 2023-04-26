@@ -5,6 +5,7 @@ import time
 ser = serial.Serial()
 
 # Search for available serial ports
+
 def find_serial_port():
     import serial.tools.list_ports
     ports = list(serial.tools.list_ports.comports())
@@ -20,7 +21,9 @@ while True:
         ser.baudrate = 9600
         ser.open()
         break
-
+    else:
+        print("No Arduino board found. Please make sure it is connected.")
+        time.sleep(5)
 
 while True:
     # Get input from the user
