@@ -6,6 +6,8 @@ const int steps_Per_Revolution = 2038;
 const int steps_per_Dispense = 4038;
 const int step_Speed = 30;
 
+int combination_List[] = {0,4,5,6,10,14,15,16,20,24,25,26,30,34,35,36};
+int combination_List_Size = 16;
 int dispensing_Time_S = 20;
 int last_Motor_Num = 1;
 int motor_Num;
@@ -43,12 +45,7 @@ void loop() {
   // Wait for a value from 1 to 6 to be received over the serial port
   if (Serial.available()) {
     int motor_Num = Serial.parseInt();
-
-    // Check if the input is valid
-    if (motor_Num < 11 || motor_Num > 64) {
-      Serial.println("Invalid input");
-      return;
-    }
+    int temp_Num = motor_Num;
 
     // Split the number into digits and store them in the array
     for (int i = 0; i < 2; i++) {
@@ -56,12 +53,8 @@ void loop() {
       motor_Num /= 10;
     }
 
-    // Access the individual digits using the array index
-    int motor_Num1 = digits[0];
-    int motor_Num2 = digits[1];
-
-    if (motor_Num1 > 0 && motor_Num2 < 7 && motor_Num2 > 0 && motor_Num2 < 7) {
-      Stepper_Drive(motor_Num1, motor_Num2);
+    if (Is_Valid_Input(temp_Num)) {
+      Stepper_Drive(digits[0], digits[1]);
     }
     else {
       Serial.println("Invalid input");
@@ -69,10 +62,8 @@ void loop() {
   }
 }
 
-
-
 void Stepper_Drive(int motor_Num1, int motor_Num2){
-  if (motor_Num2 != 0){
+  if (motor_Num1 != 0 && motor_Num2 != 0){
     stepperMotors[motor_Num1 - 1].setSpeed(step_Speed);
     stepperMotors[motor_Num2 - 1].setSpeed(step_Speed);
     for (int i = 0; i < steps_per_Dispense; i++) {
@@ -86,11 +77,27 @@ void Stepper_Drive(int motor_Num1, int motor_Num2){
       delay(10);  
     } 
   }
-  else {
+  else if (motor_Num1 != 0) {
     stepperMotors[motor_Num1 - 1].setSpeed(10);
     stepperMotors[motor_Num1 - 1].step(steps_per_Dispense);
     delay(10); 
     stepperMotors[motor_Num1 - 1].step(steps_per_Dispense);
   }
+  else {
+    stepperMotors[motor_Num2 - 1].setSpeed(10);
+    stepperMotors[motor_Num2 - 1].step(steps_per_Dispense);
+    delay(10); 
+    stepperMotors[motor_Num2 - 1].step(steps_per_Dispense);
+  }
+
 }
    
+
+bool Is_Valid_Input(int numb) {
+  for (int i = 0; i < combination_List_Size; i++) {
+    if (numb == combination_List[i]) {
+      return true; // Return true if the number is found in the list
+    }
+  }
+  return false; // Return false if the number is not found in the list
+}
