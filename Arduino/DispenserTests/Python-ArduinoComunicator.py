@@ -25,9 +25,6 @@ while True:
         print("No Arduino board found. Please make sure it is connected.")
         time.sleep(5)
 
-
-
-
 while True:
     # Get input from the user
     motor_num = input("Enter the motor number (1-6): ")
