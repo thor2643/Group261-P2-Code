@@ -4,6 +4,8 @@
 // Define the number of steps per revolution for the 28BYJ-48 stepper motor
 const int steps_Per_Revolution = 2038;
 
+int dispensing_Time_S = 20;
+int last_Motor_Num = 1;
 int motor_Num;
 
 // Define the number of stepper motors
@@ -39,12 +41,51 @@ void loop() {
   if (Serial.available()) {
     int motor_Num = Serial.parseInt();
     if (motor_Num > 0 && motor_Num < 7) {
-      stepperMotors[motor_Num - 1].setSpeed(15);
-      stepperMotors[motor_Num - 1].step(steps_Per_Revolution*2 );
-      delay(1000);  
-      stepperMotors[motor_Num - 1].step(-steps_Per_Revolution * 2);
-      delay(1000);  
-
+      
+      // Makes the code run until a motor has been activated
+      int c = 0;
+      long time_Run = millis();
+      while (c == 0)
+      {
+        // Check if the motor trying to be accessed is part of the first or second dispenser
+        if (motor_Num != 1 && motor_Num != 2 && motor_Num != 3 ) {
+          // If motor is already activated and the dispensing time has elapsed, activate the motor again
+          if (last_Motor_Num == motor_Num && (time_Run + dispensing_Time_S) <= millis()) {
+            Stepper_Drive(motor_Num);
+            c = 1; // Exit the loop when motor is activated
+          }
+          // If motor is not activated or a different motor is activated, activate the motor
+          else if (last_Motor_Num != motor_Num) {
+            Stepper_Drive(motor_Num);
+            c = 1; // Exit the loop when motor is activated
+          }
+        }
+        else {
+          // If motor is already activated and the dispensing time has elapsed, activate the motor again
+          if (last_Motor_Num == motor_Num && (time_Run + dispensing_Time_S) <= millis()) {
+            Stepper_Drive(motor_Num);
+            c = 1; // Exit the loop when motor is activated
+          }
+          // If motor is not activated or a different motor is activated, activate the motor
+          else if (last_Motor_Num != motor_Num) {
+            Stepper_Drive(motor_Num);
+            c = 1; // Exit the loop when motor is activated
+          }
+        }
+      }
+      last_Motor_Num = motor_Num; // Store the last activated motor number
     }
   }
 }
+
+
+
+
+void Stepper_Drive(int motor_Num){
+  stepperMotors[motor_Num - 1].setSpeed(15);
+  stepperMotors[motor_Num - 1].step(steps_Per_Revolution*2 );
+  delay(1000);  
+  stepperMotors[motor_Num - 1].step(-steps_Per_Revolution * 2);
+  delay(1000);
+}
+    
