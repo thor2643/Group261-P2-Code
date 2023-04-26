@@ -193,12 +193,18 @@ def set_fuse2():
     move_next_page()
     
 def Amount():
-    phone[3]=amount.get()
-    amount_label.configure(text='Amount of phones: '+ str(phone[3]))
-    amount_label.place(x=645,y=25)
-    chosen_amount.configure(text='Amount of phones: ' + str(phone[3]))
-    chosen_amount.place()
-    return phone[3]
+    try: 
+        int(amount.get())
+        phone[3]=amount.get()
+        amount_label.configure(text='Amount of phones: '+ str(phone[3]))
+        amount_label.place(x=645,y=25)
+        chosen_amount.configure(text='Amount of phones: ' + str(phone[3]))
+        chosen_amount.place()
+        return phone[3]
+    except ValueError:
+        amount_label.configure(text='Amount of phones: '+ str(phone[3]))
+        amount_label.place(x=645,y=25)
+        
 
 
 #frames:
