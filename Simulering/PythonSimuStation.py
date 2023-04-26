@@ -14,12 +14,12 @@ default_config = [1, 2, 3]   #[REAR, LOWER-ARM UP, WRIST FLIP]
 
 # Load a STEP file
 path_to_cover_file = 'C:/Users/Thor9/OneDrive - Aalborg Universitet/Dokumenter/AAU\Projektarbejde/_P2 Projekt/Tegninger/Dispenser/Cover/CoverDispenserAssembled.step'
-path_to_fuse_file = 'C:/Users/Thor9/OneDrive - Aalborg Universitet/Dokumenter/AAU\Projektarbejde/_P2 Projekt/Tegninger/Dispenser/Fuse/FuseDispenser.step'
+path_to_fuse_file = 'C:/Users/Thor9/OneDrive - Aalborg Universitet/Dokumenter/AAU\Projektarbejde/_P2 Projekt/Tegninger/Dispenser/Fuse/FuseTower.step'
 path_to_pcb_file = 'C:/Users/Thor9/OneDrive - Aalborg Universitet/Dokumenter/AAU\Projektarbejde/_P2 Projekt/Tegninger/Dispenser/PCB/PCBDispenser.step'
 path_to_gripper_file = 'C:/Users/Thor9/OneDrive - Aalborg Universitet/Dokumenter/AAU\Projektarbejde/_P2 Projekt/Tegninger/Gripper/GripperAssembled.step'
 
 paths = [path_to_cover_file, path_to_fuse_file, path_to_pcb_file, path_to_gripper_file]
-names = ["BottomDispenserAssembled", "TopDispenser", "FuseDispenser", "PCBDispenser", "Gripper"]
+names = ["BottomDispenserAssembled", "TopDispenser", "FuseTower", "PCBDispenser", "Gripper"]
 
 item_list = RDK.ItemList(list_names=True)
 
@@ -70,7 +70,7 @@ top_pose = ref_pose * robomath.transl(top_pos[0], top_pos[1], top_pos[2]) * robo
 top_pose = top_pose * robomath.transl(31,66, 0)
 
 fuse_pose = ref_pose * robomath.transl(fuse_pos[0], fuse_pos[1], fuse_pos[2]) * robomath.rotz(fuse_orient)
-fuse_pose = fuse_pose * robomath.transl(13.5, 40.3, 0)
+fuse_pose = fuse_pose * robomath.transl(98.95, 18.3, 0) #* robomath.rotx(robomath.pi/2)
 
 pcb_pose = ref_pose * robomath.transl(pcb_pos[0], pcb_pos[1], pcb_pos[2]) * robomath.rotz(pcb_orient) #robomath.TxyzRxyz_2_Pose(pcb_pos + [0,0, 0])
 pcb_pose = pcb_pose * robomath.transl(20.6, 42.5, 0)
@@ -106,7 +106,7 @@ top_target_leave = top_dispenser_pose * leave_offset * top_to_target * robomath.
 
 
 fuse_dispenser_pose = fuse_dispenser.Pose()
-fuse_to_target = robomath.transl(-13.5, -40.3, 93.4)*robomath.rotx(-robomath.pi/2) * robomath.rotx(22*robomath.pi/180) * robomath.rotz(3/2*robomath.pi)
+fuse_to_target = robomath.transl(-98.95, -18.3, 197.2)*robomath.rotx(-robomath.pi/2) * robomath.rotx(22*robomath.pi/180) * robomath.rotz(3/2*robomath.pi)
 fuse_target = fuse_dispenser_pose * fuse_to_target
 fuse_target_approach = fuse_dispenser_pose * approach_offset * fuse_to_target * robomath.rotz(robomath.pi/4)
 fuse_target_leave = fuse_dispenser_pose * leave_offset * fuse_to_target * robomath.rotz(-robomath.pi/4)
