@@ -3,10 +3,13 @@
 
 // Define the number of steps per revolution for the 28BYJ-48 stepper motor
 const int steps_Per_Revolution = 2038;
+const int steps_per_Dispense = 4038;
+const int step_Speed = 30;
 
 int dispensing_Time_S = 20;
 int last_Motor_Num = 1;
 int motor_Num;
+int digits[2];
 
 // Define the number of stepper motors
 const int num_Stepper_Motors = 6;
@@ -40,52 +43,54 @@ void loop() {
   // Wait for a value from 1 to 6 to be received over the serial port
   if (Serial.available()) {
     int motor_Num = Serial.parseInt();
-    if (motor_Num > 0 && motor_Num < 7) {
-      
-      // Makes the code run until a motor has been activated
-      int c = 0;
-      long time_Run = millis();
-      while (c == 0)
-      {
-        // Check if the motor trying to be accessed is part of the first or second dispenser
-        if (motor_Num != 1 && motor_Num != 2 && motor_Num != 3 ) {
-          // If motor is already activated and the dispensing time has elapsed, activate the motor again
-          if (last_Motor_Num == motor_Num && (time_Run + dispensing_Time_S) <= millis()) {
-            Stepper_Drive(motor_Num);
-            c = 1; // Exit the loop when motor is activated
-          }
-          // If motor is not activated or a different motor is activated, activate the motor
-          else if (last_Motor_Num != motor_Num) {
-            Stepper_Drive(motor_Num);
-            c = 1; // Exit the loop when motor is activated
-          }
-        }
-        else {
-          // If motor is already activated and the dispensing time has elapsed, activate the motor again
-          if (last_Motor_Num == motor_Num && (time_Run + dispensing_Time_S) <= millis()) {
-            Stepper_Drive(motor_Num);
-            c = 1; // Exit the loop when motor is activated
-          }
-          // If motor is not activated or a different motor is activated, activate the motor
-          else if (last_Motor_Num != motor_Num) {
-            Stepper_Drive(motor_Num);
-            c = 1; // Exit the loop when motor is activated
-          }
-        }
-      }
-      last_Motor_Num = motor_Num; // Store the last activated motor number
+
+    // Check if the input is valid
+    if (motor_Num < 11 || motor_Num > 64) {
+      Serial.println("Invalid input");
+      return;
+    }
+
+    // Split the number into digits and store them in the array
+    for (int i = 0; i < 2; i++) {
+      digits[i] = motor_Num % 10;
+      motor_Num /= 10;
+    }
+
+    // Access the individual digits using the array index
+    int motor_Num1 = digits[0];
+    int motor_Num2 = digits[1];
+
+    if (motor_Num1 > 0 && motor_Num2 < 7 && motor_Num2 > 0 && motor_Num2 < 7) {
+      Stepper_Drive(motor_Num1, motor_Num2);
+    }
+    else {
+      Serial.println("Invalid input");
     }
   }
 }
 
 
 
-
-void Stepper_Drive(int motor_Num){
-  stepperMotors[motor_Num - 1].setSpeed(15);
-  stepperMotors[motor_Num - 1].step(steps_Per_Revolution*2 );
-  delay(1000);  
-  stepperMotors[motor_Num - 1].step(-steps_Per_Revolution * 2);
-  delay(1000);
+void Stepper_Drive(int motor_Num1, int motor_Num2){
+  if (motor_Num2 != 0){
+    stepperMotors[motor_Num1 - 1].setSpeed(step_Speed);
+    stepperMotors[motor_Num2 - 1].setSpeed(step_Speed);
+    for (int i = 0; i < steps_per_Dispense; i++) {
+      stepperMotors[motor_Num1 - 1].step(1);
+      stepperMotors[motor_Num2 - 1].step(1);
+      delay(10);  
+    }
+    for (int i = 0; i < steps_per_Dispense; i++) {
+      stepperMotors[motor_Num1 - 1].step(-1);
+      stepperMotors[motor_Num2 - 1].step(-1);
+      delay(10);  
+    } 
+  }
+  else {
+    stepperMotors[motor_Num1 - 1].setSpeed(10);
+    stepperMotors[motor_Num1 - 1].step(steps_per_Dispense);
+    delay(10); 
+    stepperMotors[motor_Num1 - 1].step(steps_per_Dispense);
+  }
 }
-    
+   
