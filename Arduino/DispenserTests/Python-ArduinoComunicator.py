@@ -27,7 +27,7 @@ while True:
 while True:
     # Get input from the user
     motor_num = input("Enter the motor number (1-6): ")
-    if motor_num.isdigit() and 0 < int(motor_num) <= 6:
+    if motor_num.isdigit():
         # Send the motor number to the Arduino
         ser.write(motor_num.encode())
     else:
