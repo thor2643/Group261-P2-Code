@@ -5,7 +5,6 @@ import time
 ser = serial.Serial()
 
 # Search for available serial ports
-
 def find_serial_port():
     import serial.tools.list_ports
     ports = list(serial.tools.list_ports.comports())
@@ -28,9 +27,8 @@ while True:
 while True:
     # Get input from the user
     motor_num = input("Enter the motor number (1-6): ")
-    if motor_num.isdigit() and 0 < int(motor_num) <= 6:
+    if motor_num.isdigit():
         # Send the motor number to the Arduino
         ser.write(motor_num.encode())
-        time.sleep(17)
     else:
         print("Invalid input! Please enter a number between 1 and 6.")

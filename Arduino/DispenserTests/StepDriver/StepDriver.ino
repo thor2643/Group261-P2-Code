@@ -3,8 +3,15 @@
 
 // Define the number of steps per revolution for the 28BYJ-48 stepper motor
 const int steps_Per_Revolution = 2038;
+const int steps_per_Dispense = 4038;
+const int step_Speed = 30;
 
+int combination_List[] = {0,4,5,6,10,14,15,16,20,24,25,26,30,34,35,36};
+int combination_List_Size = 16;
+int dispensing_Time_S = 20;
+int last_Motor_Num = 1;
 int motor_Num;
+int digits[2];
 
 // Define the number of stepper motors
 const int num_Stepper_Motors = 6;
@@ -38,13 +45,59 @@ void loop() {
   // Wait for a value from 1 to 6 to be received over the serial port
   if (Serial.available()) {
     int motor_Num = Serial.parseInt();
-    if (motor_Num > 0 && motor_Num < 7) {
-      stepperMotors[motor_Num - 1].setSpeed(15);
-      stepperMotors[motor_Num - 1].step(steps_Per_Revolution*2 );
-      delay(1000);  
-      stepperMotors[motor_Num - 1].step(-steps_Per_Revolution * 2);
-      delay(1000);  
+    int temp_Num = motor_Num;
 
+    // Split the number into digits and store them in the array
+    for (int i = 0; i < 2; i++) {
+      digits[i] = motor_Num % 10;
+      motor_Num /= 10;
+    }
+
+    if (Is_Valid_Input(temp_Num)) {
+      Stepper_Drive(digits[0], digits[1]);
+    }
+    else {
+      Serial.println("Invalid input");
     }
   }
+}
+
+void Stepper_Drive(int motor_Num1, int motor_Num2){
+  if (motor_Num1 != 0 && motor_Num2 != 0){
+    stepperMotors[motor_Num1 - 1].setSpeed(step_Speed);
+    stepperMotors[motor_Num2 - 1].setSpeed(step_Speed);
+    for (int i = 0; i < steps_per_Dispense; i++) {
+      stepperMotors[motor_Num1 - 1].step(1);
+      stepperMotors[motor_Num2 - 1].step(1);
+      delay(10);  
+    }
+    for (int i = 0; i < steps_per_Dispense; i++) {
+      stepperMotors[motor_Num1 - 1].step(-1);
+      stepperMotors[motor_Num2 - 1].step(-1);
+      delay(10);  
+    } 
+  }
+  else if (motor_Num1 != 0) {
+    stepperMotors[motor_Num1 - 1].setSpeed(10);
+    stepperMotors[motor_Num1 - 1].step(steps_per_Dispense);
+    delay(10); 
+    stepperMotors[motor_Num1 - 1].step(steps_per_Dispense);
+  }
+  else {
+    stepperMotors[motor_Num2 - 1].setSpeed(10);
+    stepperMotors[motor_Num2 - 1].step(steps_per_Dispense);
+    delay(10); 
+    stepperMotors[motor_Num2 - 1].step(steps_per_Dispense);
+  }
+
+}
+   
+
+bool Is_Valid_Input(int numb) {
+  for (int i = 0; i < combination_List_Size; i++) {
+    if (numb == combination_List[i]) {
+      return true; // Return true if the number is found in the list
+    }
+  }
+  return false; // Return false if the number is not found in the list
 }
