@@ -5,9 +5,9 @@ import numpy as np
 
 RDK = robodk.robolink.Robolink()
 
-robot = RDK.Item('UR5')      # retrieve the robot by name
-robot_base = RDK.Item('UR5 Base')      # retrieve the robot by name
-ref_frame = RDK.Item('UR5 Base')
+robot = RDK.Item('UR5')                 # retrieve the robot by name
+robot_base = RDK.Item('UR5 Base')       # retrieve the robot by name
+ref_frame = RDK.Item('Ref Frame')        #RDK.Item('TableTop2x2')
 
 #Helps to choose an appropriate solution
 default_config = [1, 2, 3]   #[REAR, LOWER-ARM UP, WRIST FLIP]
@@ -126,6 +126,7 @@ targets = [top_target_approach, top_target, top_target_leave,
 
 #generate target points in robodk
 if "T1" not in RDK.ItemList(list_names=True):
+    prev_val = 360
     for i in range(len(targets)):
         target = RDK.AddTarget('T%i' % i, ref_frame)
         joints = robot.SolveIK_All(targets[i])
@@ -136,8 +137,14 @@ if "T1" not in RDK.ItemList(list_names=True):
             conf = list(config_type)
             
             if conf == [[1.0, 0.0, 0.0, 0.0]]:
-                target.setJoints(joint)
-                break
+                if (joint[5] < prev_val and joint[5] > 0) or i != 0:
+                    target.setJoints(joint)
+                    prev_val = joint[5]
+                    break
+                    #if (i == 0 and joint[5] > 0) or i != 0:
+                        #target.setJoints(joint)
+                        #prev_val = joint[5]
+                        #break
         
         target.setAsJointTarget()
         
@@ -150,14 +157,11 @@ program = RDK.AddProgram("Test program", robot)
 # Very important: Make sure we set the reference frame and tool frame so that the robot is aware of it
 program.setPoseFrame(ref_frame)
 program.setPoseTool(robot.PoseTool())
-program.setSpeed(20, 500)   #linear vel and joint vel
+program.setSpeed(200, 100)   #linear vel and joint vel
 
 #Add the movement commands
 for i in range(len(targets)):
-    if (i+2) % 3 == 0:
-        program.MoveL(RDK.Item(f"T{i}"))
-    else:
-        program.MoveJ(RDK.Item(f"T{i}"))
+    program.MoveJ(RDK.Item(f"T{i}"))
 
 program.RunProgram()
 
