@@ -2,7 +2,10 @@ import robodk
 from robodk import robomath
 import time
 import numpy as np
+import sys
+sys.path.append('c:\\Users\\Thor9\\OneDrive - Aalborg Universitet\\Dokumenter\\AAU\\Projektarbejde\\P2-Code\\Kinematic')
 
+import TrajectoryPlanning as tp
 
 
 class RoboDKProgram:
@@ -18,6 +21,8 @@ class RoboDKProgram:
     dispensers = {}
     T_dispenser_TCP = {}    #T=transformation matrix and TCP = tool center point
 
+    #Initiate an trajectory planning object
+    TPPlanner = tp.TrajectoryPlanner()
 
     def __init__(self, robot_name = 'UR5', robot_base_name = 'UR5 Base', ref_frame_name = 'UR5 Base'):
         """Initialises roboDK and retrieves the robot, robot base and reference fram"""
@@ -89,7 +94,7 @@ class RoboDKProgram:
         for name in names_in_order:
             dispenser_target = self.dispensers[name].Pose() * self.T_dispenser_TCP[name]
 
-            target = self.RDK.AddTarget(name, self.ref_frame)
+            target = self.RDK.AddTarget(f"{name} target", self.ref_frame)
             joints = self.robot.SolveIK_All(dispenser_target)
 
             #We want to choose the same config for all targets e.g. having the arm above the table
@@ -98,7 +103,7 @@ class RoboDKProgram:
                 conf = list(config_type)
                 
                 if conf == configuration:
-                    if joint[5] < prev_val:
+                    if (joint[5] < prev_val and name != names_in_order[0]) or (joint[5] > 0):
                         target.setJoints(joint)
                         prev_val = joint[5]
                         break
@@ -114,6 +119,59 @@ class RoboDKProgram:
         #Set relevant frames
         self.program.setPoseFrame(self.ref_frame)
         self.program.setPoseTool(self.robot.PoseTool())
+        self.program.setSpeed(200, 100)   #linear vel and joint vel
+        self.program.setRounding(10)
 
     def get_target_pose(self, name):
-        return self.RDK.Item("name")
+        return self.RDK.Item(name).Pose()
+    
+    def add_moveJ_from_targets(self, target_names):
+        #Add the movement commands
+        for name in target_names:
+            print(name)
+            self.program.MoveJ(self.RDK.Item(name), blocking=False)
+
+    """
+    def create_trajectory_from_targets(self, names):
+
+        #Create parabolic blend function
+        for i in range(len(names)-1):
+            joints1 = self.RDK.Item(names[i]).Joints()
+            joints2 = self.RDK.Item(names[i+1]).Joints()
+
+            f1, t0, tf = TPPlanner.get2PointMoveLFunction(joints1, joints2, 100, 0, 0)
+            
+            #Divide the trajectory into 50 points
+            for i in np.linspace(t0, tf, 100):
+
+                joint_pose = list(f1(i))
+
+                target = RDK.AddTarget('T%i' % idx, ref_frame)
+                target = target.setJoints(joint_pose)
+                target.setAsJointTarget()
+
+                #print(target.Pose())
+                # Add a linear movement (with the exception of the first point which will be a joint movement)
+                if i == 0:
+                    program.MoveJ(joint_pose)
+                else:
+                    program.MoveJ(target)
+
+                idx += 1
+                
+                if idx<50:
+                    program.setSpeed(5000, idx/10)
+                else:
+                    program.setSpeed(5000, idx1/10)
+                    idx1 -=1
+    """
+    
+    def add_moveJ(self, joints):
+        self.program.MoveJ(joints, blocking=False)
+
+    def add_moveL(self, joints):
+        self.program.MoveJ(joints, blocking=False)
+    
+
+    def run(self):
+        self.program.RunProgram()

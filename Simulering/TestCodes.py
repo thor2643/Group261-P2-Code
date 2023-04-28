@@ -6,7 +6,7 @@ names_paths = [["TopDispenser", 'C:/Users/Thor9/OneDrive - Aalborg Universitet/D
                ["PCBDispenser", 'C:/Users/Thor9/OneDrive - Aalborg Universitet/Dokumenter/AAU\Projektarbejde/_P2 Projekt/Tegninger/Dispenser/PCB/PCBDispenser.step'],
                ["BottomDispenser", 'C:/Users/Thor9/OneDrive - Aalborg Universitet/Dokumenter/AAU\Projektarbejde/_P2 Projekt/Tegninger/Dispenser/Cover/CoverDispenserAssembled.step']]
 
-simulation = RoboDKProgram.RoboDKProgram()
+simulation = RoboDKProgram.RoboDKProgram(ref_frame_name="Ref Frame")
 
 #Uncomment to load files from pc
 #simulation.load_dispensers_from_PC(names_paths)
@@ -28,6 +28,7 @@ names_angles = [[names[0], 0],
                 [names[1], 30],
                 [names[2], 60],
                 [names[3], 90]]
+
 simulation.set_in_circular_position(names_angles)
 
 #Uncomment to create target points
@@ -35,3 +36,11 @@ simulation.create_dispenser_targetpoints(names)
 
 prog_name = "Main program"
 simulation.initialise_program(prog_name)
+
+target_names = [name+" target" for name in names]
+simulation.add_moveJ_from_targets(target_names)
+
+
+
+#position = [100, 100, 0]
+

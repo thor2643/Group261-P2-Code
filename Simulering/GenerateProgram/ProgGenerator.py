@@ -39,7 +39,7 @@ if new_program:
 
 
     #Divide the trajectory into 50 points
-    for i in np.linspace(t0, tf, 100):
+    for i in np.linspace(t0, tf, 35):
 
         joint_pose = list(f1(i))
 
@@ -57,9 +57,9 @@ if new_program:
         idx += 1
         
         if idx<50:
-            program.setSpeed(5000, idx/10)
+            program.setSpeed(3000, 100)#idx/10)
         else:
-            program.setSpeed(5000, idx1/10)
+            program.setSpeed(3000, 100)#idx1/10)
             idx1 -=1
     
 
