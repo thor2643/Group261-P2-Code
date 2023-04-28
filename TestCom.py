@@ -4,7 +4,7 @@ import socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Bind the socket to a specific IP address and port
-server_address = ('172.26.50.66',53432)
+server_address = ('192.168.0.229',53432)
 sock.bind(server_address)
 
 # Listen for incoming connections
