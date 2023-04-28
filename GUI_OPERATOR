@@ -282,22 +282,21 @@ def Move_back_page():
 
 def Calculate(indput):
     if indput==1:
-        hi=Dispensor_number[1]
-        Dispensor_number[1]=int(fuse_entry.get())
-        Dispensor_number[1]=Dispensor_number+hi
-        print('1')
-        return Dispensor_number[1]    
+        for i in range(0,7):
+                numb2=int(entry_names[i].get())
+                number=Dispensor_number[i]
+                print(number+numb2)
+                Dispensor_number[i]=numb2 + number
+                return Dispensor_number[i]  
 
     if indput==2:
         for i in range(0,7):
-            try: 
                 int(entry_names[i].get())
                 number=Dispensor_number[i]
                 Dispensor_number[i]=int(entry_names[i].get()) - number
                 return Dispensor_number[i]
-            except ValueError:
-                Dispensor_number[i]=Dispensor_number[i]
-            print(Dispensor_number[i])     
+            
+                
         
 def Add():
     Calculate(1)
