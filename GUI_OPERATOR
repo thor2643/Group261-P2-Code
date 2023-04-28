@@ -11,12 +11,12 @@ root.minsize(200, 200)  # width, height
 root.maxsize(1200, 750)
 root.geometry("1200x750+200+0") # width, height, placement on screen 
 root.title("Control GUI")
-Dispensor_number=[10,10,10,10,10,10,10,10] #0-2:top covor colors, 3: fuses, 4-6: bottom color fuses, 7: PCB.
+Dispensor_number=[10,10,10,10,10,10,10,10] #0 PCB, 1 fuses, 2-4: top cover colors, 5-7: bot cover colors.
+
 
 
 main_frame = tk.Frame(root, bg='#F0F0F0')
 main_frame.pack(fill=tk.BOTH, expand=True)
-#main_frame.pack_propagate(False)
 
 #page 1:
 page_1 = tk.Frame(main_frame)
@@ -48,7 +48,7 @@ fill_PCB=tk.Label(PCB_frame, text=" ",bg= 'white')
 fill_PCB.pack()
 PCB=tk.Label(PCB_frame, text='PCB:', font=('Times New Roman',30,'bold'), background= 'white')
 PCB.pack()
-PCB_number=tk.Label(PCB_frame, text= str(Dispensor_number[7]), font=('Times New Roman',25),bg='white')
+PCB_number=tk.Label(PCB_frame, text= str(Dispensor_number[0]), font=('Times New Roman',25),bg='white')
 PCB_number.pack()
 PCB_refill=tk.Label(PCB_frame, text='Refill needed!!', font=('Times New Roman',30,'bold'),fg='red', bg= 'white')
 PCB_refill.pack()
@@ -58,7 +58,7 @@ fill_fuse=tk.Label(Fuse_frame, text=" ",bg= 'white')
 fill_fuse.pack()
 Fuse=tk.Label(Fuse_frame, text='Fuses:', font=('Times New Roman',30,'bold'), background= 'white')
 Fuse.pack()
-Fuse_number=tk.Label(Fuse_frame, text= str(Dispensor_number[3]), font=('Times New Roman',25),bg='white')
+Fuse_number=tk.Label(Fuse_frame, text= str(Dispensor_number[1]), font=('Times New Roman',25),bg='white')
 Fuse_number.pack()
 Fuse_refill=tk.Label(Fuse_frame, text='Refill needed!!', font=('Times New Roman',30,'bold'),fg='red', bg= 'white')
 Fuse_refill.pack()
@@ -78,7 +78,7 @@ top_cov_col=tk.Label(top_cov_frame,
                      background= 'white')
 top_cov_col.pack()
 top_cov_number=tk.Label(top_cov_frame,
-                        text= str(Dispensor_number[0]) + "             " + str(Dispensor_number[1]) + "            " + str(Dispensor_number[2]),
+                        text= str(Dispensor_number[2]) + "             " + str(Dispensor_number[3]) + "            " + str(Dispensor_number[4]),
                         font=('Times New Roman',25),
                         bg='white')
 top_cov_number.pack()
@@ -102,7 +102,7 @@ bot_cov_col=tk.Label(bot_cov_frame,
                      background= 'white')
 bot_cov_col.pack()
 bot_cov_number=tk.Label(bot_cov_frame,
-                        text= str(Dispensor_number[4]) + "             " + str(Dispensor_number[5]) + "            " + str(Dispensor_number[6]),
+                        text= str(Dispensor_number[5]) + "             " + str(Dispensor_number[6]) + "            " + str(Dispensor_number[7]),
                         font=('Times New Roman',25),
                         bg='white')
 bot_cov_number.pack()
@@ -116,6 +116,97 @@ bot_cov_refill.pack()
 page_2 = tk.Frame(main_frame)
 page_2_lb=tk.Label(page_2, text='Refill', font=('Times New Roman',30,'bold'), bg='#F0F0F0')
 page_2_lb.grid(row=0,  column=0, columnspan=4, padx=5,  pady=5)
+message_Alert2=tk.Label(page_2, text='Type the number of items added or removed', font=('Times New Roman',15,'bold'),bg='#F0F0F0')
+message_Alert2.grid(row=1,  column=0, columnspan=4, padx=20,  pady=20)
+message_Alert3=tk.Label(page_2, text=' and push the corresponding button:', font=('Times New Roman',15,'bold'),bg='#F0F0F0')
+message_Alert3.place(x=390,y=150)
+
+#frames page 2:
+PCB_frame2  =  Frame(page_2,  width=300,  height= 200,  bg='white', highlightbackground="black", highlightthickness=2)
+PCB_frame2.grid(row=1, rowspan=2,  column=0, sticky='w',  padx=10,  pady=10)
+PCB_frame2.pack_propagate(False)
+
+Fuse_frame2  =  Frame(page_2,  width=300,  height=200,  bg='white', highlightbackground="black", highlightthickness=2)
+Fuse_frame2.grid(row=1, rowspan=2, column=3, sticky='e',  padx=10,  pady=10)
+Fuse_frame2.pack_propagate(False)
+
+top_cov_frame2  =  Frame(page_2,  width=525,  height=  350,  bg='white', highlightbackground="black", highlightthickness=2)
+top_cov_frame2.grid(row=3,  column=0, columnspan=2, sticky='w', padx=10,  pady=10)
+top_cov_frame2.pack_propagate(False)
+
+bot_cov_frame2  =  Frame(page_2,  width=525,  height=350,  bg='white', highlightbackground="black", highlightthickness=2)
+bot_cov_frame2.grid(row=3,  column=2, columnspan=2, sticky='e',  padx=10,  pady=10)
+bot_cov_frame2.pack_propagate(False)
+
+#PCB:
+fill_PCB=tk.Label(PCB_frame2, text=" ",bg= 'white')
+fill_PCB.pack()
+PCB=tk.Label(PCB_frame2, text='PCB:', font=('Times New Roman',30,'bold'), background= 'white')
+PCB.pack()
+PCB_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
+PCB_entry.insert(0, 0)
+PCB_entry.place(x=115,y=170)
+
+
+#Fuses:
+fill_fuse=tk.Label(Fuse_frame2, text=" ",bg= 'white')
+fill_fuse.pack()
+Fuse=tk.Label(Fuse_frame2, text='Fuses:', font=('Times New Roman',30,'bold'), background= 'white')
+Fuse.pack()
+fuse_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
+fuse_entry.insert(0, 0)
+fuse_entry.place(x=885,y=170)
+
+
+#TOP Cover:
+fill_top_cov=tk.Label(top_cov_frame2, text=" ",bg= 'white')
+fill_top_cov.pack()
+fill_top_cov_1=tk.Label(top_cov_frame2, text=" ",bg= 'white')
+fill_top_cov_1.pack()
+fill_top_cov_2=tk.Label(top_cov_frame2, text=" ",bg= 'white')
+fill_top_cov_2.pack()
+top_cov=tk.Label(top_cov_frame2, text='Top cover:', font=('Times New Roman',30,'bold'), background= 'white')
+top_cov.pack(anchor=CENTER)
+top_cov_col=tk.Label(top_cov_frame2, 
+                     text='Black:         Blue:         White:',
+                     font=('Times New Roman',20),
+                     background= 'white')
+top_cov_col.pack()
+top_cov_black_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
+top_cov_black_entry.insert(0, 0)
+top_cov_black_entry.place(x=650,y=475)
+top_cov_blue_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
+top_cov_blue_entry.insert(0, 0)
+top_cov_blue_entry.place(x=775,y=475)
+top_cov_white_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
+top_cov_white_entry.insert(0, 0)
+top_cov_white_entry.place(x=905,y=475)
+
+
+#BOT Cover:
+fill_bot_cov=tk.Label(bot_cov_frame2, text=" ",bg= 'white')
+fill_bot_cov.pack()
+fill_bot_cov_1=tk.Label(bot_cov_frame2, text=" ",bg= 'white')
+fill_bot_cov_1.pack()
+fill_bot_cov_2=tk.Label(bot_cov_frame2, text=" ",bg= 'white')
+fill_bot_cov_2.pack()
+bot_cov=tk.Label(bot_cov_frame2, text='Bottom cover:', font=('Times New Roman',30,'bold'), background= 'white')
+bot_cov.pack()
+bot_cov_col=tk.Label(bot_cov_frame2, 
+                     text='Black:         Blue:         White:',
+                     font=('Times New Roman',20),
+                     background= 'white')
+bot_cov_col.pack()
+bot_cov_black_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
+bot_cov_black_entry.insert(0, 0)
+bot_cov_black_entry.place(x=100,y=475)
+bot_cov_blue_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
+bot_cov_blue_entry.insert(0, 0)
+bot_cov_blue_entry.place(x=225,y=475)
+bot_cov_white_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
+bot_cov_white_entry.insert(0, 0)
+bot_cov_white_entry.place(x=355,y=475)
+
 
 #array for pages:
 pages = [page_1, page_2]
@@ -123,7 +214,52 @@ print(count)
 page = pages[count]
 page.pack()
 
+#array used in funktion:
+entry_names=[PCB_entry,fuse_entry,top_cov_black_entry,top_cov_blue_entry,top_cov_white_entry,bot_cov_black_entry,top_cov_blue_entry,top_cov_white_entry] #de 8 entry
+
 #funktions:
+def Update_Entry():
+    PCB_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
+    PCB_entry.insert(0, 0)
+    PCB_entry.place(x=115,y=170)
+    fuse_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
+    fuse_entry.insert(0, 0)
+    fuse_entry.place(x=885,y=170)
+    top_cov_black_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
+    top_cov_black_entry.insert(0, 0)
+    top_cov_black_entry.place(x=650,y=475)
+    top_cov_blue_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
+    top_cov_blue_entry.insert(0, 0)
+    top_cov_blue_entry.place(x=775,y=475)
+    top_cov_white_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
+    top_cov_white_entry.insert(0, 0)
+    top_cov_white_entry.place(x=905,y=475)
+    bot_cov_black_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
+    bot_cov_black_entry.insert(0, 0)
+    bot_cov_black_entry.place(x=100,y=475)
+    bot_cov_blue_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
+    bot_cov_blue_entry.insert(0, 0)
+    bot_cov_blue_entry.place(x=225,y=475)
+    bot_cov_white_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
+    bot_cov_white_entry.insert(0, 0)
+    bot_cov_white_entry.place(x=355,y=475)
+
+
+def Update_Numbers():
+    PCB_number.configure(text= str(Dispensor_number[0]))
+    PCB_number.pack()
+    Fuse_number.configure(text= str(Dispensor_number[1]))
+    Fuse_number.pack()
+    top_cov_number.configure(text= str(Dispensor_number[2]) + "             " + str(Dispensor_number[3]) + "            " + str(Dispensor_number[4]),)
+    top_cov_number.pack()
+    bot_cov_number.configure(text= str(Dispensor_number[5]) + "             " + str(Dispensor_number[6]) + "            " + str(Dispensor_number[7]),)
+    bot_cov_number.pack()
+    
+def Clear_Entry():
+    for i in entry_names:
+        i.delete(0, END)
+    
+
 def Refill(): #next page
     global count
     for p in pages:
@@ -132,17 +268,87 @@ def Refill(): #next page
     count += 1
     page = pages[count]
     page.pack()
+    Update_Entry()
     return count
 
+def Move_back_page():
+    global count
+    for p in pages:
+            p.pack_forget()
+
+    count -= 1
+    page = pages[count]
+    page.pack()
+    Update_Numbers()
+    print(Dispensor_number)
+    return count
+
+def Calculate(indput):
+    if indput=='add':
+        numb=0
+        for i in entry_names:
+            print(i)
+            try: 
+                int(i.get())
+                number=Dispensor_number[numb]
+                Dispensor_number[numb]=int(i.get()) + number
+                return Dispensor_number[3]
+            except ValueError:
+                Dispensor_number[numb]=Dispensor_number[numb]
+            print(Dispensor_number[numb])
+        numb +=1
+
+    if indput=='rem':
+        numb=0
+        for i in entry_names:
+            try: 
+                int(i.get())
+                number=Dispensor_number[numb]
+                Dispensor_number[numb]=i.get()-number
+                return Dispensor_number[3]
+            except ValueError:
+                Dispensor_number[numb]=Dispensor_number[numb]
+        numb +=1        
+        
+    
+def Add():
+    print('ADD')
+    Calculate('add')
+    Move_back_page()
+    Clear_Entry()
+    
+def Rem():
+    Calculate('rem')
+    Move_back_page()
+    Clear_Entry()
+
 #bottons:
-refill_btn=tk.Button(page_1,text='Refill', 
+refill_btn=tk.Button(page_1,text='Refill now', 
                      font=('Bold', 20),
                      bg='white',
                      width=8,
                      relief=GROOVE,
-                     #command=Refill()
+                     command=Refill
                      )
 refill_btn.grid(row=2,  column=0, columnspan=4,  padx=5,  pady=5)
 
+#buttons page chance:
+add_btn = tk.Button(page_2,text='Add', 
+                     font=('Bold', 20),
+                     bg='green', 
+                     width=8,
+                     relief=GROOVE,
+                     command=Add
+                     )
+add_btn.place(x=400,y=200)
+
+remove_btn = tk.Button(page_2, text='Remove',
+                     font=('Bold', 20),
+                     bg='red',
+                     width=8,
+                     relief=GROOVE, 
+                     command=Rem
+                     )
+remove_btn.place(x=555,y=200)
 
 root.mainloop()
