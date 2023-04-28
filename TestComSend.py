@@ -1,18 +1,27 @@
-import bluetooth
+import socket
 
-server_address = 'F8-A2-D6-BA-93-5E'  # replace with the MAC address of the receiving device
-port = 1  # must match the port number on the receiving device
+# Create a TCP/IP socket
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-sock.connect((server_address, port))
+# Connect the socket to the server's IP address and port
+server_address = (' 172.26.50.66', 53432)
+sock.connect(server_address)
 
-while True:
-    # get a double digit value from user
-    value = input("Enter a double digit value (00-99): ")
-    if len(value) == 2 and value.isdigit():
-        # send the value as bytes
-        sock.send(bytes(value, 'utf-8'))
-    else:
-        print("Invalid input, please enter a double digit value (00-99)")
+try:
+    # Send data
+    message = b'Hello, server!'
+    sock.sendall(message)
+    print('Sent:', message.decode())
 
-sock.close()
+    # Look for the response
+    amount_received = 0
+    amount_expected = len(message)
+
+    while amount_received < amount_expected:
+        data = sock.recv(16)
+        amount_received += len(data)
+        print('Received:', data.decode())
+
+finally:
+    # Clean up the connection
+    sock.close()

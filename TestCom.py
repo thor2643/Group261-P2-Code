@@ -1,24 +1,31 @@
-import bluetooth
+import socket
 
-server_address = ''  # leave blank to accept connections from any device
-port = 1  # must match the port number on the sending device
+# Create a TCP/IP socket
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-sock.bind((server_address, port))
+# Bind the socket to a specific IP address and port
+server_address = (' 172.26.50.66', 53432)
+sock.bind(server_address)
+
+# Listen for incoming connections
 sock.listen(1)
 
-print("Waiting for connection...")
-
-client_sock, client_info = sock.accept()
-print("Accepted connection from", client_info)
-
 while True:
-    # receive data from sender
-    data = client_sock.recv(1024)
-    if data:
-        # convert bytes to string and display the value received
-        value = data.decode('utf-8')
-        print("Received value:", value)
+    # Wait for a connection
+    print('Waiting for a connection...')
+    connection, client_address = sock.accept()
+    print('Connected by', client_address)
 
-client_sock.close()
-sock.close()
+    try:
+        # Receive the data in small chunks and retransmit it
+        while True:
+            data = connection.recv(16)
+            print('Received:', data.decode())
+            if data:
+                connection.sendall(data)
+            else:
+                break
+
+    finally:
+        # Clean up the connection
+        connection.close()
