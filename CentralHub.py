@@ -6,7 +6,7 @@ import socket
 import csv
 import os
 
-# - - - - - - - - - All initilization of the communications protocol and functions for connection - - - - - - - - - 
+# - - - - - - - - - All initilization of the communication protocols and functions for connection - - - - - - - - - 
 
 # Set up the serial connections
 arduino_ser = serial.Serial()
@@ -25,7 +25,6 @@ def Find_Serial_Port(search_Key):
     for p in ports:
         if search_Key in p.description:
             return p.device
-
 
 # Wait until the Arduino is found
 def Connect_To_Arduino():
@@ -53,13 +52,13 @@ line_Number = 0
 filename = 'OrderList.csv'
 fieldnames = ['data']
 
-delete_file = input("Do you want to delete the CSV file? (y/n)").lower() == 'y'
+delete_File = input("Do you want to delete the CSV file? (y/n)").lower() == 'y'
 
-# Delete the CSV file if it exists
-if delete_file and os.path.exists(filename):
+# Delete the CSV file if it exists, and the delete_File variable is true
+if delete_File and os.path.exists(filename):
     os.remove(filename)
 
-# Open the CSV file in 'append' mode and write the header row if the file is empty
+# Open the CSV file in 'append' mode and write the header row if the file is empty/none empty
 with open(filename, 'a', newline='') as csvfile:
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
     if os.path.exists(filename) and os.stat(filename).st_size > 0:
@@ -95,7 +94,8 @@ def read_data_from_csv(filename, line_number):
         row = next(reader)
         return row[0]
 
-#Find out what line number which the program reached last time it was run
+#Find out what line number which the program reached last time it was run. In the document "data" is the header, and on line 2 the value of the last reached data line is found.
+#The default value is 3, as the first two lines are occoupied.
 with open(filename, "r") as csvfile:
     reader = csv.reader(csvfile)
     # Skip the header row
