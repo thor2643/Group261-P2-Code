@@ -47,6 +47,7 @@ Connect_To_Arduino()
 # - - - - - - - - - All initilization of the .CSV document - - - - - - - - - 
 
 line_Number = 0
+start_Num = '3'
 
 # Define the file name and column headers
 filename = 'OrderList.csv'
@@ -67,18 +68,18 @@ with open(filename, 'a', newline='') as csvfile:
     else:
         # file does not exist or is empty, write header
         writer.writeheader()
-        writer.writerow({'data': 3})
+        writer.writerow({'data':1})
 
 def Update_Data_Row_Reached(line):
     with open(filename, 'r') as csvfile:
-        reader = csv.reader(file)
+        reader = csv.reader(csvfile)
         data_Injection = list(reader)
    
     # Replace the second row with new data
     data_Injection[1] = line
 
     # Write the updated data back to the CSV file
-    with open('data.csv', 'w', newline='') as file:
+    with open(filename, 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerows(data_Injection)
 
@@ -88,7 +89,7 @@ def read_data_from_csv(filename, line_number):
         # Skip the header row
         next(reader)
         # Skip all rows until we reach the desired row number
-        for i in range(line_number - 1):
+        for i in range(line_number - 2):
             next(reader)
         # Return the data from the desired row
         row = next(reader)
@@ -103,19 +104,22 @@ with open(filename, "r") as csvfile:
     row = next(reader)
     line_Number = int(row[0])
 
+Update_Data_Row_Reached(start_Num)
+
 # - - - - - - - - - Function to append and recive data. From both the arduino, but also the PC - - - - - - - - -
 
 # Function to send data to the Arduino
 def Send_To_Arduino():
     #the code here is not complete. This could be done by another function like Data_Decoder
     line_data = read_data_from_csv(filename, line_Number)
-    
-    while True:
+    print(line_data)
+
+    """while True:
         # Append digits to the Arduino
         # Make sure that the digits are contained within the following list or the Arduino won't do anything:
         # {0, 4, 5, 6, 10, 14, 15, 16, 20, 24, 25, 26, 30, 34, 35, 36}
         arduino_ser.write(line_data.encode())
-        time.sleep(1)
+        time.sleep(1)"""
 
 # Function to receive data from the PC
 def Receive_From_Pc():
@@ -159,7 +163,10 @@ pc_thread.join()
 
 # - - - - - - - - - Main Code - - - - - - - - -
 
-Receive_From_Pc()
-
-
+#Receive_From_Pc()
+while True:
+    
+    line_Number =+ 1
+    Send_To_Arduino()
+    
 
