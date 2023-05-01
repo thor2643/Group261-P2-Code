@@ -293,6 +293,8 @@ var_entry7 = 0
 def entry_0():
     global entry0
     var_entry0= PCB_entry.get()
+    return var_entry0
+
 
 def Calculate(indput):
     if indput==1:
