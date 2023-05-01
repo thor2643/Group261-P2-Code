@@ -280,6 +280,20 @@ def Move_back_page():
     print(Dispensor_number)
     return count
 
+#entry variables:
+var_entry0 = 0
+var_entry1 = 0
+var_entry2 = 0
+var_entry3 = 0
+var_entry4 = 0
+var_entry5 = 0
+var_entry6 = 0
+var_entry7 = 0
+
+def entry_0():
+    global entry0
+    var_entry0= PCB_entry.get()
+
 def Calculate(indput):
     if indput==1:
         for i in range(0,7):
