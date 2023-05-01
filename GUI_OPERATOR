@@ -142,11 +142,11 @@ fill_PCB=tk.Label(PCB_frame2, text=" ",bg= 'white')
 fill_PCB.pack()
 PCB=tk.Label(PCB_frame2, text='PCB:', font=('Times New Roman',30,'bold'), background= 'white')
 PCB.pack()
-PCB_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
+PCB_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black", exportselection=1)
 PCB_entry.insert(0, 0)
 PCB_entry.place(x=115,y=170)
 
-
+global fuse_entry
 #Fuses:
 fill_fuse=tk.Label(Fuse_frame2, text=" ",bg= 'white')
 fill_fuse.pack()
@@ -170,6 +170,8 @@ top_cov_col=tk.Label(top_cov_frame2,
                      text='Black:         Blue:         White:',
                      font=('Times New Roman',20),
                      background= 'white')
+
+
 top_cov_col.pack()
 top_cov_black_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
 top_cov_black_entry.insert(0, 0)
@@ -205,15 +207,13 @@ bot_cov_blue_entry.place(x=225,y=475)
 bot_cov_white_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
 bot_cov_white_entry.insert(0, 0)
 bot_cov_white_entry.place(x=355,y=475)
+entry_names=[PCB_entry,fuse_entry,top_cov_black_entry,top_cov_blue_entry,top_cov_white_entry,bot_cov_black_entry,bot_cov_blue_entry,bot_cov_white_entry]
 
 
 #array for pages:
 pages = [page_1, page_2]
 page = pages[count]
 page.pack()
-
-#array used in funktion:
-entry_names=[PCB_entry,fuse_entry,top_cov_black_entry,top_cov_blue_entry,top_cov_white_entry,bot_cov_black_entry,top_cov_blue_entry,top_cov_white_entry] #de 8 entry
 
 #funktions:
 def Update_Entry():
@@ -280,42 +280,50 @@ def Move_back_page():
     print(Dispensor_number)
     return count
 
-#entry variables:
-var_entry0 = 0
-var_entry1 = 0
-var_entry2 = 0
-var_entry3 = 0
-var_entry4 = 0
-var_entry5 = 0
-var_entry6 = 0
-var_entry7 = 0
+#entry variables
+entry_values=[0,1,2,3,4,5,6,7] 
 
-def entry_0():
-    global entry0
-    var_entry0= PCB_entry.get()
-    return var_entry0
+def get_entry_values():
+    global entry_values
+    global fuse_entry
+    entry_values[0]= int(PCB_entry.get())
+    entry_values[1]= int(fuse_entry.get())
+    entry_values[2]= int(top_cov_black_entry.get())
+    entry_values[3]= int(top_cov_blue_entry.get())
+    entry_values[4]= int(top_cov_white_entry.get())
+    entry_values[5]= int(bot_cov_black_entry.get())
+    entry_values[6]= int(bot_cov_blue_entry.get())
+    entry_values[7]= int(bot_cov_white_entry.get())
+    print('entry values')
+    print(entry_values)
 
 
 def Calculate(indput):
+    global entry_values
+    global Dispensor_number
+    get_entry_values()
     if indput==1:
         for i in range(0,7):
-            int(fuse_entry.get)
-            numb2=int(fuse_entry.get)
-            number=Dispensor_number[i]
-            print(numb2)
-            print(number)
-            print(number+numb2)
-            Dispensor_number[i]=numb2 + number 
+            print('nummer')
+            print(i)
+            print('Dispensor numb før')
+            print(Dispensor_number[i])
+            print('entry value')
+            print(entry_values[i])
+            Dispensor_number[i]=Dispensor_number[i] + entry_values[i]
+            print('Dispensor numb efter')
+            print(Dispensor_number[i])
+        return Dispensor_number
  
     if indput==2:
         for i in range(0,7):
-                entry_names[i].get()
-                number=Dispensor_number[i]
-                Dispensor_number[i]=int(entry_names[i].get) - number
+            Dispensor_number[i]=Dispensor_number[i] - entry_values[i]
+        return Dispensor_number
             
                 
         
 def Add():
+    print(PCB_entry.get())
     Calculate(1)
     Move_back_page()
     Clear_Entry()
@@ -389,4 +397,5 @@ remove_btn = tk.Button(page_2, text='Remove',
 remove_btn.place(x=555,y=200)
 
 Check_If_Refill_Needed()
+
 root.mainloop()
