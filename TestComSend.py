@@ -4,12 +4,12 @@ import socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Connect the socket to the server's IP address and port
-server_address = ('192.168.0.229',53432)
+server_address = ('192.168.137.141',53432)
 sock.connect(server_address)
 
 try:
     # Send data
-    message = b'Hello, server!'
+    message = b'Hello, Magnus!'
     sock.sendall(message)
     print('Sent:', message.decode())
 
