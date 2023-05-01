@@ -121,6 +121,11 @@ def Page_buttons():
 def move_next_page():
     global count
         
+    if count ==4: 
+        print(phone)
+        print('---------------sendt----------------------')
+        Send_Data()
+        
     color_chosen()
     #chosen_amount.configure(text='Amount of phones: ' + str(amount_chosen))
     chosen_view.configure(text='You have chosen the following:')
@@ -146,9 +151,6 @@ def move_next_page():
         Page_buttons()
         return count
     
-    if count==5:
-        print('sendt')
-        Send_Data()
         
 
 
@@ -200,7 +202,7 @@ def set_fuse2():
 def Amount():
     try: 
         int(amount.get())
-        phone[3]=amount.get()
+        phone[3]=int(amount.get())
         amount_label.configure(text='Amount of phones: '+ str(phone[3]))
         amount_label.place(x=645,y=25)
         chosen_amount.configure(text='Amount of phones: ' + str(phone[3]))
@@ -220,7 +222,10 @@ def Send_Data():
 
     try:
         # Send data
-        message = ', '.join(phone)
+        message_not_bytes =', '.join(str(x) for x in phone)
+        print(message_not_bytes)
+        message = bytes(message_not_bytes, 'utf-8')
+        print(message)
         sock.sendall(message)
         print('Sent:', message.decode())
 
