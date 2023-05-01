@@ -220,7 +220,7 @@ def Send_Data():
 
     try:
         # Send data
-        message = phone
+        message = ', '.join(phone)
         sock.sendall(message)
         print('Sent:', message.decode())
 
