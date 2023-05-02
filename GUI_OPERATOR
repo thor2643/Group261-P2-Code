@@ -358,7 +358,7 @@ def Check_If_Refill_Needed():
     else:
         Fuse_refill.configure(fg='white')
     
-    if (Dispensor_number[2] < 5) or (Dispensor_number[3] < 5) or (Dispensor_number[4] < 5) or (Dispensor_number[5] < 5) or (Dispensor_number[6] < 5) or (Dispensor_number[7] < 5):
+    if (Dispensor_number[2] < 5) or (Dispensor_number[3] < 5) or (Dispensor_number[4] < 5):
         top_cov_refill.configure(fg='red')
         top_cov_refill.pack()
     else:
