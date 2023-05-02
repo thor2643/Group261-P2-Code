@@ -3,7 +3,6 @@ from tkinter import *
 from PIL import ImageTk, Image
 import socket
 
-
 # root window
 root = tk.Tk()
 root.configure(background="light blue")
@@ -14,11 +13,12 @@ root.title('Design your phone')
 root.resizable(0, 0)
 phone = [0,0,0,1]  #(0=black, 1=blue, 2=white), 0-2 fuses, color, amount
 count=0  #page
-color= ['Black','Black', 'Black']
+color= ['Black','Blue', 'White']
 
 
 main_frame = tk.Frame(root, bg='light blue')
 
+#Funktion:
 def color_chosen():
     global color
     n = range(3)
@@ -32,14 +32,15 @@ def color_chosen():
     return color
 
 #Each page is defined
-page_1 = tk.Frame(main_frame)
-page_1_lb=tk.Label(page_1, text='Build your phone', font=('Times New Roman',30,'bold'), bg='light blue')
+page_1 = tk.Frame(main_frame, bg='light blue')
+page_1_lb=tk.Label(page_1, text='Build your phone', font=('Times New Roman',30,'bold'), fg='Black', bg='light blue')
+page_1_lb.pack()
+page_1.pack()
+
 #image part:
 img=Image.open('phone_assemp.png')
 resize_img= img.resize((300,300))
 page_1_img = ImageTk.PhotoImage(resize_img)
-page_1_lb.pack()
-page_1.pack()
 label_img = tk.Label(page_1, image = page_1_img, fg='light blue', bg='light blue')
 label_img.pack()
 
@@ -47,11 +48,9 @@ page_2 = tk.Frame(main_frame)
 page_2_lb=tk.Label(page_2, text='Bottom cover color', font=('Times New Roman',30,'bold'), bg='light blue')
 page_2_lb.pack()
 
-
 page_3 = tk.Frame(main_frame)
 page_3_lb=tk.Label(page_3, text='Number of fuses', font=('Times New Roman',30,'bold'), bg='light blue')
 page_3_lb.pack()
-
 
 page_4 = tk.Frame(main_frame)
 page_4_lb=tk.Label(page_4, text='Top cover color', font=('Times New Roman',30,'bold'), bg='light blue')
@@ -77,13 +76,11 @@ page.pack(pady=100)
 
 main_frame.pack(fill=tk.BOTH, expand=True)
  
-#funktions
+# Button funktions
 def hide_button(widget):
     # This will remove the widget from toplevel
     widget.pack_forget()
-  
-  
-# Method to make Button(widget) visible
+
 def show_button(widget):
     widget.pack_forget()
     # This will recover the widget from toplevel
@@ -96,19 +93,19 @@ def show_button(widget):
     
 def Page_buttons():
     if count == 1 or count == 3:
-        show_button(black_btn)
-        show_button(blue_btn)
-        show_button(white_btn)
         hide_button(fuse_0)
         hide_button(fuse_1)
         hide_button(fuse_2)
+        show_button(black_btn)
+        show_button(blue_btn)
+        show_button(white_btn)
     if count == 2:
-        show_button(fuse_0)
-        show_button(fuse_1)
-        show_button(fuse_2)
         hide_button(black_btn)
         hide_button(blue_btn)
         hide_button(white_btn)
+        show_button(fuse_0)
+        show_button(fuse_1)
+        show_button(fuse_2)
     if count == 0 or count == 4:
         hide_button(black_btn)
         hide_button(blue_btn)
@@ -151,9 +148,6 @@ def move_next_page():
         Page_buttons()
         return count
     
-        
-
-
 def move_back_page():
     global count
     
@@ -211,7 +205,8 @@ def Amount():
     except ValueError:
         amount_label.configure(text='Amount of phones: '+ str(phone[3]))
         amount_label.place(x=645,y=25)
-        
+
+#Funktion for COMUNIKATION:    
 def Send_Data():
     # Create a TCP/IP socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -282,21 +277,17 @@ black_btn = tk.Button(root,text='Black',
                     command=set_black,
                     relief=GROOVE)
 
-
 blue_btn = tk.Button(root,text='Blue', 
                     font=('Bold', 20),
                     bg='blue', fg='white', width=8,
                     command=set_blue,
                     relief=GROOVE)
 
-
 white_btn = tk.Button(root, text='White', 
                     font=('Bold', 20),
                     bg='white', fg='black', width=8,
                     command=set_white,
                     relief=GROOVE)
-
-
 
 #bottoms for fuses:
 
