@@ -1,8 +1,10 @@
 import Kinematics as km
+import KinematicsSilas as kms
 import sympy as sp
 import math
 
 UR5Kin = km.Kinematics()
+UR5KinS = kms.KinematicsSilas()
 sp.init_printing()
 t1, t2, t3, t4, t5, t6 = sp.symbols("t1, t2, t3, t4, t5, t6")
 
@@ -45,3 +47,4 @@ r = UR5Kin.AngleAxisToMatrix(k)
 #print()
 #sp.pprint(UR5Kin.MatrixToAngleAxis(r))
 
+UR5KinS.getJointsFromPose([0,0,0,30,40,50])
