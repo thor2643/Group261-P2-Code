@@ -17,7 +17,7 @@ arduino_ser = serial.Serial()
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Bind the socket to a specific IP address and port
-server_address = ('172.26.50.66',53432)
+server_address = ('172.27.30.88',53432)
 sock.bind(server_address)
 # Listen for incoming connections
 sock.listen(1)
@@ -110,6 +110,7 @@ def read_data_from_csv(filename, line_number):
             next(reader)
             is_last_row = False
         except StopIteration:
+            is_last_row = True
             pass
 
     data_write = False
@@ -117,7 +118,9 @@ def read_data_from_csv(filename, line_number):
     if not is_last_row:
         line_number += 1
 
-    return x
+    line_Number = line_number
+
+    return x, line_Number
 
 
 #Find out what line number which the program reached last time it was run. In the document "data" is the header, and on line 2 the value of the last reached data line is found.
@@ -221,20 +224,18 @@ def Receive_From_Pc():
             connection.close()
 
 def Main_controller(line_Number, last_Line_Number):
-
+    phone_assembly, line_Number = read_data_from_csv(filename, line_Number)
     if line_Number > last_Line_Number:
         last_Line_Number = line_Number
-        phone_assembly = read_data_from_csv(filename, line_Number)
         Double_Digit = Conversion_Arr_To_DD(phone_assembly)   
 
         for i in range(phone_assembly[3]):
             Send_To_Arduino(Double_Digit)
-            time.sleep(20)   
+            time.sleep(2)   
     else:
-        print('No new number')
-
-    
-    
+        #print('No new number')
+        pass
+    return line_Number, last_Line_Number
 
 
 # - - - - - - - - - Threading - - - - - - - - -
@@ -247,7 +248,8 @@ pc_thread.start()
 
 # - - - - - - - - - Main Code - - - - - - - - -
 while True:
-    Main_controller(line_Number, last_Line_Number)
+    #print('Main controller received this line number:' + str(line_Number))
+    line_Number, last_Line_Number = Main_controller(line_Number, last_Line_Number)
 
 #close the thread
 pc_thread.join()
