@@ -1,10 +1,12 @@
+#import sys
+#sys.path.append('C:\ProgramData\Anaconda3\Lib\site-packages')
 import sympy as sp
-from sympy.abc import q1, q2, q3, q4, q5, q6
 from sympy import *
 import numpy as np
 import math
 
-class Kinematics:
+
+class KinematicsSilas:
     trans_mats = {}
     trans_order = []
     forwardMatrix = None
@@ -101,25 +103,26 @@ class Kinematics:
         return R_matrix
 
 
-# DH parameters for UR5 robot
-DH_Params_UR5 = [[0,0,0,theta_1],[-pi/2,0,0,theta_2][0,425,0,theta_3],[0,392.25,109.15,theta_4],[-pi/2,0,94.65,theta_5],[pi/2,0,0,theta_6]]
+    # DH parameters for UR5 robot
+    theta_1, theta_2, theta_3, theta_4, theta_5, theta_6 = symbols("theta_1, theta_2, theta_3, theta_4, theta_5, theta_6")
+    DH_Params_UR5 = [[0,0,0,theta_1],[-pi/2,0,0,theta_2],[0,425,0,theta_3],[0,392.25,109.15,theta_4],[-pi/2,0,94.65,theta_5],[pi/2,0,0,theta_6]]
     def getJointsFromPose(self, pose):
         pose = [x, y, z, roll, pitch, yaw]
 
-        pose_Transformation_Matrix = sp.Matrix([cos(pose[4]) * cos(pose[5]), sin(pose[3]) * sin(pose[4]) * cos(pose[5]) - cos(pose[3]) * sin(pose[5]), cos(pose[3]) * sin(pose[4]) * cos(pose[5]) + sin(pose[3]) * sin(pose[5]), pose[0]],
-        [cos(pose[4]) * sin(pose[5]), sin(pose[3]) * sin(pose[4]) * sin(pose[5]) + cos(pose[3]) * cos(pose[5]), cos(pose[3]) * sin(pose[4]) * sin(pose[5]) - sin(pose[3]) * cos(pose[5]), pose[1]],
-        [-sin(pose[4]), sin(pose[3]) * cos(pose[4]), cos(pose[3]) * cos(pose[4]), pose[2]]
+        pose_Transformation_Matrix = sp.Matrix([cos(pose[4]) * sp.cos(pose[5]), sp.sin(pose[3]) * sp.sin(pose[4]) * sp.cos(pose[5]) - sp.cos(pose[3]) * sp.sin(pose[5]), sp.cos(pose[3]) * sp.sin(pose[4]) * sp.cos(pose[5]) + sp.sin(pose[3]) * sp.sin(pose[5]), pose[0]],
+        [sp.cos(pose[4]) * sp.sin(pose[5]), sp.sin(pose[3]) * sp.sin(pose[4]) * sp.sin(pose[5]) + sp.cos(pose[3]) * sp.cos(pose[5]), sp.cos(pose[3]) * sp.sin(pose[4]) * sp.sin(pose[5]) - sp.sin(pose[3]) * sp.cos(pose[5]), pose[1]],
+        [-sp.sin(pose[4]), sp.sin(pose[3]) * sp.cos(pose[4]), sp.cos(pose[3]) * sp.cos(pose[4]), pose[2]],
         [0, 0, 0, 1])
         
-        T_base_0 = sp.Matrix([-1 0 0 0],
-                            [0 -1 0 0],
-                            [0 0 1 89.159],
-                            [0 0 0 1])
+        T_base_0 = sp.Matrix([-1, 0, 0, 0],
+                            [0, -1, 0, 0],
+                            [0, 0, 1, 89.159],
+                            [0, 0, 0, 1])
 
-        T_6_tool= sp.Matrix([-1 0 0 0],
-                            [0 -1 0 0],
-                            [0 0 1 82.3],
-                            [0 0 0 1])
+        T_6_tool= sp.Matrix([-1, 0, 0, 0],
+                            [0, -1, 0, 0],
+                            [0, 0, 1, 82.3],
+                            [0, 0, 0, 1])
 
         T_0_6 = (T_base_0**-1) * (pose_Transformation_Matrix) * (T_6_tool**-1)
 
@@ -147,8 +150,8 @@ DH_Params_UR5 = [[0,0,0,theta_1],[-pi/2,0,0,theta_2][0,425,0,theta_3],[0,392.25,
                  [theta_1_b,theta_2_h,theta_3_h,theta_4_h,theta_5_d,theta_6_d]]
 
         # theta 1 - two solutions
-        theta_1_a = sp.atan2(y_0_6,x_0_6)+sp.acos(d_4/(sqrt(x_0_6**2+y_0_6**2)))-self.pi/2)
-        theta_1_b = sp.atan2(y_0_6,x_0_6)-sp.acos(d_4/(sqrt(x_0_6**2+y_0_6**2)))-self.pi/2)
+        theta_1_a = sp.atan2(y_0_6,x_0_6) + sp.acos(d_4/(sqrt(x_0_6**2+y_0_6**2)))-self.pi/2
+        theta_1_b = sp.atan2(y_0_6,x_0_6) - sp.acos(d_4/(sqrt(x_0_6**2+y_0_6**2)))-self.pi/2
 
         # theta 5 - four solutions
         theta_5_a = sp.acos(-r_23*sp.cos(theta_1_a)+r_13*sin(theta_1_a)) # theta_1_a
