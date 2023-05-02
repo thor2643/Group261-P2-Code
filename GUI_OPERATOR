@@ -11,7 +11,7 @@ root.minsize(200, 200)  # width, height
 root.maxsize(1200, 750)
 root.geometry("1200x750+200+0") # width, height, placement on screen 
 root.title("Control GUI")
-Dispensor_number=[5,6,7,8,9,10,11,12] #0 PCB, 1 fuses, 2-4: top cover colors, 5-7: bot cover colors.
+Dispensor_number=[0,0,0,0,0,0,0,0] #0 PCB, 1 fuses, 2-4: top cover colors, 5-7: bot cover colors.
 
 
 
@@ -183,12 +183,24 @@ bot_cov_col=tk.Label(bot_cov_frame2,
                      background= 'white')
 bot_cov_col.pack()
 
-#funktion for removal:
+#Refill needed text:
+PCB_refill=tk.Label(PCB_frame, text='Refill needed!!', font=('Times New Roman',30,'bold'),fg='red', bg= 'white')
+PCB_refill.pack()
+
+Fuse_refill=tk.Label(Fuse_frame, text='Refill needed!!', font=('Times New Roman',30,'bold'),fg='red', bg= 'white')
+Fuse_refill.pack()
+
+top_cov_refill=tk.Label(top_cov_frame, text='Refill needed!!', font=('Times New Roman',30,'bold'),fg='red', bg= 'white')
+top_cov_refill.pack()
+
+bot_cov_refill=tk.Label(bot_cov_frame, text='Refill needed!!', font=('Times New Roman',30,'bold'),fg='red', bg= 'white')
+bot_cov_refill.pack()
+
+#funktion for removal of entry input:
 def remove_0(indput):
     indput.delete(0,'0')
 
-
-#Entry defined
+#Entry is beeing defined:
 PCB_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black", exportselection=1)
 PCB_entry.place(x=115,y=170)
 PCB_entry.bind('<FocusIn>', remove_0(PCB_entry))
@@ -221,15 +233,13 @@ bot_cov_white_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightb
 bot_cov_white_entry.place(x=905,y=475)
 bot_cov_white_entry.bind('<FocusIn>', remove_0(bot_cov_white_entry))
 
+#array with entry names:
 entry_names=[PCB_entry,fuse_entry,top_cov_black_entry,top_cov_blue_entry,top_cov_white_entry,bot_cov_black_entry,bot_cov_blue_entry,bot_cov_white_entry]
-
-
 
 #array for pages:
 pages = [page_1, page_2]
 page = pages[count]
 page.pack()
-
 
 #funktions:  
 def entry_eq_0():
@@ -281,7 +291,6 @@ def Refill(): #Moves to next page
     page.pack()
     entry_eq_0()
     
-
 def Move_back_page():
     global count
     for p in pages:
@@ -291,12 +300,10 @@ def Move_back_page():
     page = pages[count]
     page.pack()
     Update_Numbers()
-    Check_If_Refill_Needed()
     print(Dispensor_number)
     
-
 #entry variables
-entry_values=[0,1,2,3,4,5,6,7] 
+entry_values=[0,0,0,0,0,0,0,0] 
 
 def get_entry_values():
     global entry_values
@@ -309,76 +316,60 @@ def get_entry_values():
     entry_values[5]= int(bot_cov_black_entry.get())
     entry_values[6]= int(bot_cov_blue_entry.get())
     entry_values[7]= int(bot_cov_white_entry.get())
-    print('entry values')
-    print(entry_values)
-
 
 def Calculate(indput):
     global entry_values
     global Dispensor_number
     get_entry_values()
     if indput==1:
-        for i in range(0,7):
-            print('nummer')
-            print(i)
-            print('Dispensor numb før')
-            print(Dispensor_number[i])
-            print('entry value')
-            print(entry_values[i])
+        for i in range(0,8):
             Dispensor_number[i]=Dispensor_number[i] + entry_values[i]
-            print('Dispensor numb efter')
-            print(Dispensor_number[i])
+        print(entry_values)
+        print(Dispensor_number)
         return Dispensor_number
  
     if indput==2:
-        for i in range(0,7):
+        for i in range(0,8):
             Dispensor_number[i]=Dispensor_number[i] - entry_values[i]
         return Dispensor_number
-            
-                
-        
+                              
 def Add():
-    print(PCB_entry.get())
     Calculate(1)
     Move_back_page()
     Clear_Entry()
+    Check_If_Refill_Needed()
     
 def Rem():
     Calculate(2)
     Move_back_page()
     Clear_Entry()
+    Check_If_Refill_Needed()
     
 def Check_If_Refill_Needed():
     if Dispensor_number[0] < 5:
-        PCB_refill=tk.Label(PCB_frame, text='Refill needed!!', font=('Times New Roman',30,'bold'),fg='red', bg= 'white')
+        PCB_refill.configure(fg='red')
         PCB_refill.pack()
     else:
-        PCB_refill=tk.Label(PCB_frame, text='Refill needed!!', font=('Times New Roman',30,'bold'),fg='red', bg= 'white')
-        PCB_refill.pack()
-        PCB_refill.pack_forget()
+        PCB_refill.configure(fg='white')
+    
     if Dispensor_number[1] < 41:
-        Fuse_refill=tk.Label(Fuse_frame, text='Refill needed!!', font=('Times New Roman',30,'bold'),fg='red', bg= 'white')
+        Fuse_refill.configure(fg='red')
         Fuse_refill.pack()
     else:
-        Fuse_refill=tk.Label(Fuse_frame, text='Refill needed!!', font=('Times New Roman',30,'bold'),fg='red', bg= 'white')
-        Fuse_refill.pack()
-        Fuse_refill.pack_forget()
-    for i in range(2,4):
-        if Dispensor_number[i] < 4:
-            top_cov_refill=tk.Label(top_cov_frame, text='Refill needed!!', font=('Times New Roman',30,'bold'),fg='red', bg= 'white')
-            top_cov_refill.pack()
-        else:
-            top_cov_refill=tk.Label(top_cov_frame, text='Refill needed!!', font=('Times New Roman',30,'bold'),fg='red', bg= 'white')
-            top_cov_refill.pack()
-            top_cov_refill.pack_forget()
-    for i in range(5,7):
-        if Dispensor_number[i] < 4:
-            bot_cov_refill=tk.Label(bot_cov_frame, text='Refill needed!!', font=('Times New Roman',30,'bold'),fg='red', bg= 'white')
-            bot_cov_refill.pack()
-        else:
-            bot_cov_refill=tk.Label(bot_cov_frame, text='Refill needed!!', font=('Times New Roman',30,'bold'),fg='red', bg= 'white')
-            bot_cov_refill.pack()
-            bot_cov_refill.pack_forget()
+        Fuse_refill.configure(fg='white')
+    
+    if (Dispensor_number[2] < 5) or (Dispensor_number[3] < 5) or (Dispensor_number[4] < 5) or (Dispensor_number[5] < 5) or (Dispensor_number[6] < 5) or (Dispensor_number[7] < 5):
+        top_cov_refill.configure(fg='red')
+        top_cov_refill.pack()
+    else:
+        top_cov_refill.configure(fg='white')
+
+    if (Dispensor_number[5] < 5) or (Dispensor_number[6] < 5) or (Dispensor_number[7] < 5):
+        bot_cov_refill.configure(fg='red')
+        bot_cov_refill.pack()
+    else:
+        bot_cov_refill.configure(fg='white')
+        
 
 #bottons:
 refill_btn=tk.Button(page_1,text='Refill now',
@@ -410,7 +401,5 @@ remove_btn = tk.Button(page_2, text='Remove',
                      command=Rem
                      )
 remove_btn.place(x=555,y=200)
-
-Check_If_Refill_Needed()
 
 root.mainloop()
