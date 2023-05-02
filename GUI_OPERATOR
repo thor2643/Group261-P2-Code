@@ -324,8 +324,6 @@ def Calculate(indput):
     if indput==1:
         for i in range(0,8):
             Dispensor_number[i]=Dispensor_number[i] + entry_values[i]
-        print(entry_values)
-        print(Dispensor_number)
         return Dispensor_number
  
     if indput==2:
