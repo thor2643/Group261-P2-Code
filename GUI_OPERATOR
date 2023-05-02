@@ -120,6 +120,7 @@ message_Alert2.grid(row=1,  column=0, columnspan=4, padx=20,  pady=20)
 message_Alert3=tk.Label(page_2, text=' and push the corresponding button:', font=('Times New Roman',15,'bold'),bg='#F0F0F0')
 message_Alert3.place(x=390,y=150)
 
+
 #frames page 2:
 PCB_frame2  =  Frame(page_2,  width=300,  height= 200,  bg='white', highlightbackground="black", highlightthickness=2)
 PCB_frame2.grid(row=1, rowspan=2,  column=0, sticky='w',  padx=10,  pady=10)
@@ -142,19 +143,13 @@ fill_PCB=tk.Label(PCB_frame2, text=" ",bg= 'white')
 fill_PCB.pack()
 PCB=tk.Label(PCB_frame2, text='PCB:', font=('Times New Roman',30,'bold'), background= 'white')
 PCB.pack()
-PCB_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black", exportselection=1)
-PCB_entry.insert(0, 0)
-PCB_entry.place(x=115,y=170)
 
-global fuse_entry
+
 #Fuses:
 fill_fuse=tk.Label(Fuse_frame2, text=" ",bg= 'white')
 fill_fuse.pack()
 Fuse=tk.Label(Fuse_frame2, text='Fuses:', font=('Times New Roman',30,'bold'), background= 'white')
 Fuse.pack()
-fuse_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
-fuse_entry.insert(0, 0)
-fuse_entry.place(x=885,y=170)
 
 
 #TOP Cover:
@@ -170,18 +165,7 @@ top_cov_col=tk.Label(top_cov_frame2,
                      text='Black:         Blue:         White:',
                      font=('Times New Roman',20),
                      background= 'white')
-
-
 top_cov_col.pack()
-top_cov_black_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
-top_cov_black_entry.insert(0, 0)
-top_cov_black_entry.place(x=650,y=475)
-top_cov_blue_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
-top_cov_blue_entry.insert(0, 0)
-top_cov_blue_entry.place(x=775,y=475)
-top_cov_white_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
-top_cov_white_entry.insert(0, 0)
-top_cov_white_entry.place(x=905,y=475)
 
 
 #BOT Cover:
@@ -198,16 +182,47 @@ bot_cov_col=tk.Label(bot_cov_frame2,
                      font=('Times New Roman',20),
                      background= 'white')
 bot_cov_col.pack()
+
+#funktion for removal:
+def remove_0(indput):
+    indput.delete(0,'0')
+
+
+#Entry defined
+PCB_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black", exportselection=1)
+PCB_entry.place(x=115,y=170)
+PCB_entry.bind('<FocusIn>', remove_0(PCB_entry))
+
+fuse_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
+fuse_entry.place(x=885,y=170)
+fuse_entry.bind('<FocusIn>', remove_0(fuse_entry))
+
+top_cov_black_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
+top_cov_black_entry.place(x=100,y=475)
+top_cov_black_entry.bind('<FocusIn>', remove_0(top_cov_black_entry))
+
+top_cov_blue_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
+top_cov_blue_entry.place(x=225,y=475)
+top_cov_blue_entry.bind('<FocusIn>', remove_0(top_cov_blue_entry))
+
+top_cov_white_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
+top_cov_white_entry.place(x=355,y=475)
+top_cov_white_entry.bind('<FocusIn>', remove_0(top_cov_white_entry))
+
 bot_cov_black_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
-bot_cov_black_entry.insert(0, 0)
-bot_cov_black_entry.place(x=100,y=475)
+bot_cov_black_entry.place(x=650,y=475)
+bot_cov_black_entry.bind('<FocusIn>', remove_0(bot_cov_black_entry))
+
 bot_cov_blue_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
-bot_cov_blue_entry.insert(0, 0)
-bot_cov_blue_entry.place(x=225,y=475)
+bot_cov_blue_entry.place(x=775,y=475)
+bot_cov_blue_entry.bind('<FocusIn>', remove_0(bot_cov_blue_entry))
+
 bot_cov_white_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
-bot_cov_white_entry.insert(0, 0)
-bot_cov_white_entry.place(x=355,y=475)
+bot_cov_white_entry.place(x=905,y=475)
+bot_cov_white_entry.bind('<FocusIn>', remove_0(bot_cov_white_entry))
+
 entry_names=[PCB_entry,fuse_entry,top_cov_black_entry,top_cov_blue_entry,top_cov_white_entry,bot_cov_black_entry,bot_cov_blue_entry,bot_cov_white_entry]
+
 
 
 #array for pages:
@@ -215,33 +230,33 @@ pages = [page_1, page_2]
 page = pages[count]
 page.pack()
 
-#funktions:
-def Update_Entry():
-    PCB_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
-    PCB_entry.insert(0, 0)
-    PCB_entry.place(x=115,y=170)
-    fuse_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
-    fuse_entry.insert(0, 0)
-    fuse_entry.place(x=885,y=170)
-    top_cov_black_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
-    top_cov_black_entry.insert(0, 0)
-    top_cov_black_entry.place(x=650,y=475)
-    top_cov_blue_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
-    top_cov_blue_entry.insert(0, 0)
-    top_cov_blue_entry.place(x=775,y=475)
-    top_cov_white_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
-    top_cov_white_entry.insert(0, 0)
-    top_cov_white_entry.place(x=905,y=475)
-    bot_cov_black_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
-    bot_cov_black_entry.insert(0, 0)
-    bot_cov_black_entry.place(x=100,y=475)
-    bot_cov_blue_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
-    bot_cov_blue_entry.insert(0, 0)
-    bot_cov_blue_entry.place(x=225,y=475)
-    bot_cov_white_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black")
-    bot_cov_white_entry.insert(0, 0)
-    bot_cov_white_entry.place(x=355,y=475)
 
+#funktions:  
+def entry_eq_0():
+    PCB_entry.insert(0,'0')
+    PCB_entry.bind('<FocusIn>', remove_0(PCB_entry))
+
+    fuse_entry.insert(0,'0')
+    fuse_entry.bind('<FocusIn>', remove_0(fuse_entry))
+
+    top_cov_black_entry.insert(0,'0')
+    top_cov_black_entry.bind('<FocusIn>', remove_0(top_cov_black_entry))
+
+    top_cov_blue_entry.insert(0,'0')
+    top_cov_blue_entry.bind('<FocusIn>', remove_0(top_cov_blue_entry))
+
+    top_cov_white_entry.insert(0,'0')
+    top_cov_white_entry.bind('<FocusIn>', remove_0(top_cov_white_entry))
+
+    bot_cov_black_entry.insert(0,'0')
+    bot_cov_black_entry.bind('<FocusIn>', remove_0(bot_cov_black_entry))
+
+    bot_cov_blue_entry.insert(0,'0')
+    bot_cov_blue_entry.bind('<FocusIn>', remove_0(bot_cov_blue_entry))
+
+    bot_cov_white_entry.insert(0,'0')
+    bot_cov_white_entry.bind('<FocusIn>', remove_0(bot_cov_white_entry))
+  
 def Update_Numbers():
     PCB_number.configure(text= str(Dispensor_number[0]))
     PCB_number.pack()
@@ -256,7 +271,7 @@ def Clear_Entry():
     for i in entry_names:
         i.delete(0, END)
     
-def Refill(): #next page
+def Refill(): #Moves to next page
     global count
     for p in pages:
         p.pack_forget()
@@ -264,8 +279,8 @@ def Refill(): #next page
     count += 1
     page = pages[count]
     page.pack()
-    Update_Entry()
-    return count
+    entry_eq_0()
+    
 
 def Move_back_page():
     global count
@@ -278,7 +293,7 @@ def Move_back_page():
     Update_Numbers()
     Check_If_Refill_Needed()
     print(Dispensor_number)
-    return count
+    
 
 #entry variables
 entry_values=[0,1,2,3,4,5,6,7] 
