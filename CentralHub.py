@@ -8,6 +8,7 @@ import os
 
 last_Line_Number = 0
 data = True
+dispense_Cycle_Time_Sec = 20
 
 # - - - - - - - - - All initilization of the communication protocols and functions for connection - - - - - - - - - 
 
@@ -78,8 +79,8 @@ def Update_Data_Row_Reached(line):
         reader = csv.reader(csvfile)
         data_Injection = list(reader)
    
-    # Replace the second row with new data
-    data_Injection[1] = str(line)
+    # Replace the second row with new data. The data has to be a string. A comma seems to arrive when str() is used. Therefore this method is used.
+    data_Injection[1] = str(line).replace(',', '')
 
     # Write the updated data back to the CSV file
     with open(filename, 'w', newline='') as file:
@@ -103,7 +104,6 @@ def read_data_from_csv(filename, line_number):
             is_last_row = True
             row = []
        
-
         if row == ['3']:
             row = ''
 
@@ -120,13 +120,13 @@ def read_data_from_csv(filename, line_number):
 
 
 #Find out what line number which the program reached last time it was run. In the document "data" is the header, and on line 2 the value of the last reached data line is found.
-#The default value is 3, as the first two lines are occoupied.
+#The default value is 3, as the first two lines are occupied.
 with open(filename, "r") as csvfile:
     reader = csv.reader(csvfile)
     # Skip the header row
     next(reader)
     row = next(reader)
-    line_Number = int(row[0])
+    line_Number = int(row[0]) # There is a conversion error some place. That makes a double digits in the document become a comma separeted value
 
 Update_Data_Row_Reached(start_Num)
 
@@ -226,7 +226,7 @@ def Main_controller(line_Number, last_Line_Number):
             
         for i in range(phone_assembly[3]):
             Send_To_Arduino(Double_Digit)
-            time.sleep(20)   
+            time.sleep(dispense_Cycle_Time_Sec)
         
         Update_Data_Row_Reached(line_Number)
     else:
