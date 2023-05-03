@@ -179,10 +179,11 @@ class KinematicsSilas:
             T_0_1 = self.getTransformationMatrix(DH_Params_UR5[0][0],DH_Params_UR5[0][1],DH_Params_UR5[0][2],angles[i][0])
             T_4_5 = self.getTransformationMatrix(DH_Params_UR5[4][0],DH_Params_UR5[4][1],DH_Params_UR5[4][2],angles[i][4])
             T_5_6 = self.getTransformationMatrix(DH_Params_UR5[5][0],DH_Params_UR5[5][1],DH_Params_UR5[5][2],angles[i][5])
-            T_1_4 = (T_0_1**-1)*T_0_6*((T_4_5*T_5_6)**-1)
+            T14 = (T_0_1**-1)*T_0_6*((T_4_5*T_5_6)**-1)
+            T_1_4 = sp.Matrix(T14)
 
-            x_1_4 = T_1_4[0][3]
-            z_1_4 = T_1_4[2][3]
+            x_1_4 = T_1_4[0,3]
+            z_1_4 = T_1_4[2,3]
             
             angles[2*i-1][2] = sp.acos((x_1_4**2+z_1_4**2-a_2**2-a_3**2)/(2*a_2*a_3))
             angles[2*i][2] = -sp.acos((x_1_4**2+z_1_4**2-a_2**2-a_3**2)/(2*a_2*a_3))
@@ -193,23 +194,24 @@ class KinematicsSilas:
             T2_4_5 = self.getTransformationMatrix(DH_Params_UR5[4][0],DH_Params_UR5[4][1],DH_Params_UR5[4][2],angles[i][4])
             T2_5_6 = self.getTransformationMatrix(DH_Params_UR5[5][0],DH_Params_UR5[5][1],DH_Params_UR5[5][2],angles[i][5])
 
-            T_1_4 = (T2_0_1**-1)*T_0_6*(T2_4_5*T_5_6)**-1
-            x_1_4 = T_1_4[1][4]
-            z_1_4 = T_1_4[3][4]
-            angles[i][2] = sp.atan2(x_1_4,z_1_4)-sp.asin((a_3*sp.sin(angles[i][3]))/sp.sqrt(x_1_4**2+z_1_4**2))
+            T214 = (T2_0_1**-1)*T_0_6*(T2_4_5*T_5_6)**-1
+            T2_1_4 = sp.Matrix(T214)
+            x2_1_4 = T2_1_4[0,3]
+            z2_1_4 = T2_1_4[2,3]
+            angles[i][1] = sp.atan2(x2_1_4,z2_1_4) - sp.asin((a_3*sp.sin(angles[i][2]))/sp.sqrt(x2_1_4**2+z2_1_4**2))
 
         # theta 4
         for i in range(8):
-            if (angles[i][2]).is_real == True and (angles[i][3]).is_real == True:
-                T_1 = T_0_1(angles[i][1])
-                T_2 = T_1_2(angles[i][2])
-                T_3 = T_2_3(angles[i][3])
-                T_5 = T_4_5(angles[i][5])
-                T_6 = T_5_6(angles[i][6])
+            if (angles[i][1]).is_real == True and (angles[i][2]).is_real == True:
+                T_1 = self.getTransformationMatrix(DH_Params_UR5[0][0],DH_Params_UR5[0][1],DH_Params_UR5[0][2],angles[i][0])
+                T_2 = self.getTransformationMatrix(DH_Params_UR5[1][0],DH_Params_UR5[1][1],DH_Params_UR5[1][2],angles[i][1])
+                T_3 = self.getTransformationMatrix(DH_Params_UR5[2][0],DH_Params_UR5[2][1],DH_Params_UR5[2][2],angles[i][2])
+                T_5 = self.getTransformationMatrix(DH_Params_UR5[4][0],DH_Params_UR5[4][1],DH_Params_UR5[4][2],angles[i][4])
+                T_6 = self.getTransformationMatrix(DH_Params_UR5[5][0],DH_Params_UR5[5][1],DH_Params_UR5[5][2],angles[i][5])
                 
                 T_3_4_ = (T_1*T_2*T_3)**-1*T_0_6*(T_5*T_6)**-1
-                X_y_3_4 = T_3_4_[2][1] 
-                X_x_3_4 = T_3_4_[1][1] 
-                angles[i][4] = sp.atan2(X_y_3_4,X_x_3_4)
+                X_y_3_4 = T_3_4_[1,0] 
+                X_x_3_4 = T_3_4_[0,0] 
+                angles[i][3] = sp.atan2(X_y_3_4,X_x_3_4)
         
         return angles
