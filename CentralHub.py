@@ -17,7 +17,7 @@ arduino_ser = serial.Serial()
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Bind the socket to a specific IP address and port
-server_address = ('192.168.137.141',53432)
+server_address = ('172.27.30.88',53432)
 sock.bind(server_address)
 # Listen for incoming connections
 sock.listen(1)
