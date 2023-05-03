@@ -17,7 +17,7 @@ arduino_ser = serial.Serial()
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Bind the socket to a specific IP address and port - thors er '192.168.137.141'
-server_address = ('192.168.137.141',53432)
+server_address = ('192.168.0.229',53432)
 sock.bind(server_address)
 # Listen for incoming connections
 sock.listen(1)
@@ -49,7 +49,7 @@ Connect_To_Arduino()
 # - - - - - - - - - All initilization of the .CSV document - - - - - - - - - 
 
 line_Number = 0
-start_Num = '3'
+start_Num = 3
 
 # Define the file name and column headers
 filename = 'OrderList.csv'
@@ -70,8 +70,9 @@ with open(filename, 'a', newline='') as csvfile:
     else:
         # file does not exist or is empty, write header
         writer.writeheader()
-        writer.writerow({'data':1})
-
+        writer.writerow({'data':0})
+        csvfile.seek(0)
+    
 def Update_Data_Row_Reached(line):
     with open(filename, 'r') as csvfile:
         reader = csv.reader(csvfile)
@@ -86,7 +87,6 @@ def Update_Data_Row_Reached(line):
         writer.writerows(data_Injection)
 
 def read_data_from_csv(filename, line_number):
-
     with open(filename, 'r') as csvfile:
         reader = csv.reader(csvfile)
         # Skip the header row
@@ -94,27 +94,29 @@ def read_data_from_csv(filename, line_number):
         # Skip all rows until we reach the desired row number
         for i in range(line_number - 2):
             next(reader)
-        # Return the data from the desired row
-        row = next(reader)
-
-        txt = row[0]
-        x = [int(num) for num in txt.split(', ')]
-
-        # Check if current row is the last row in the file
-        is_last_row = True
+        
+        # Check if there are more rows in the file
         try:
-            next(reader)
+            row = next(reader)
             is_last_row = False
         except StopIteration:
             is_last_row = True
-            pass
+            row = []
+       
 
-    if not is_last_row:
-        line_number += 1
+        if row == ['3']:
+            row = ''
 
-    line_Number = line_number
+        txt = row[0] if row else ''
+        x = []
+        if txt.strip():
+            x = [int(num) for num in txt.split(', ')]
 
-    return x, line_Number
+        # Adjust the line_number if there are more rows in the file
+        line_number += 1 if not is_last_row else 0
+
+    return x, line_number
+
 
 
 #Find out what line number which the program reached last time it was run. In the document "data" is the header, and on line 2 the value of the last reached data line is found.
@@ -216,14 +218,10 @@ def Receive_From_Pc():
 
 def Main_controller(line_Number, last_Line_Number):
     last_Line_Number = line_Number
-    print(line_Number)
-    print(last_Line_Number)
+    
     phone_assembly, line_Number = read_data_from_csv(filename, line_Number)
-    print(line_Number)
-    print(last_Line_Number)
-    time.sleep(2)
-    print(phone_assembly)
-    if line_Number > last_Line_Number:
+    
+    if line_Number > last_Line_Number and phone_assembly:
         Double_Digit = Conversion_Arr_To_DD(phone_assembly)   
             
         for i in range(phone_assembly[3]):
@@ -250,5 +248,5 @@ while True:
     #print('Main controller received this line number:' + str(line_Number))
     line_Number, last_Line_Number = Main_controller(line_Number, last_Line_Number)
 
-#close the thread
+#close the thread - This part of the code cannot be reached. This is on purpose, as we at all times want to have the server opened if the program is running. 
 pc_thread.join()
