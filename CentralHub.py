@@ -7,7 +7,7 @@ import csv
 import os
 
 last_Line_Number = 0
-data_write = False
+data = True
 
 # - - - - - - - - - All initilization of the communication protocols and functions for connection - - - - - - - - - 
 
@@ -16,8 +16,8 @@ arduino_ser = serial.Serial()
 
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# Bind the socket to a specific IP address and port
-server_address = ('172.27.30.88',53432)
+# Bind the socket to a specific IP address and port - thors er '192.168.137.141'
+server_address = ('192.168.137.141',53432)
 sock.bind(server_address)
 # Listen for incoming connections
 sock.listen(1)
@@ -78,7 +78,7 @@ def Update_Data_Row_Reached(line):
         data_Injection = list(reader)
    
     # Replace the second row with new data
-    data_Injection[1] = line
+    data_Injection[1] = str(line)
 
     # Write the updated data back to the CSV file
     with open(filename, 'w', newline='') as file:
@@ -86,11 +86,7 @@ def Update_Data_Row_Reached(line):
         writer.writerows(data_Injection)
 
 def read_data_from_csv(filename, line_number):
-    global data_write
-    if (data_write):
-        time.sleep(1)
-    
-    data_write = True
+
     with open(filename, 'r') as csvfile:
         reader = csv.reader(csvfile)
         # Skip the header row
@@ -112,8 +108,6 @@ def read_data_from_csv(filename, line_number):
         except StopIteration:
             is_last_row = True
             pass
-
-    data_write = False
 
     if not is_last_row:
         line_number += 1
@@ -207,16 +201,13 @@ def Receive_From_Pc():
                 data = connection.recv(16)
                 print('Received:', data.decode())
                 if data:
-                    if data_write:
-                        time.sleep(1)
 
-                    data_write = True
                     # Save the received data to the CSV file
                     with open(filename, 'a', newline='') as csvfile:
                         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
                         writer.writerow({'data': data.decode()})
                     connection.sendall(data)
-                    data_write = False
+
                 else:
                     break
         finally:
@@ -224,14 +215,22 @@ def Receive_From_Pc():
             connection.close()
 
 def Main_controller(line_Number, last_Line_Number):
+    last_Line_Number = line_Number
+    print(line_Number)
+    print(last_Line_Number)
     phone_assembly, line_Number = read_data_from_csv(filename, line_Number)
+    print(line_Number)
+    print(last_Line_Number)
+    time.sleep(2)
+    print(phone_assembly)
     if line_Number > last_Line_Number:
-        last_Line_Number = line_Number
         Double_Digit = Conversion_Arr_To_DD(phone_assembly)   
-
+            
         for i in range(phone_assembly[3]):
             Send_To_Arduino(Double_Digit)
-            time.sleep(2)   
+            time.sleep(20)   
+        
+        Update_Data_Row_Reached(line_Number)
     else:
         #print('No new number')
         pass
