@@ -30,21 +30,26 @@ T_6_tool = sp.Matrix([  [-1,  0,  0,   0],
 
 UR5Kin.declareForwardSymbols([t1, t2, t3, t4, t5, t6])
 UR5Kin.setDHParams(dh_params)
+t01 = UR5Kin.setDHParams(dh_params[0])
+#t_0_1 = sp.Matrix(t01)
 UR5Kin.addTransMatrix("T_base_0", T_base_0, 0)
 UR5Kin.addTransMatrix("T_6_tool", T_6_tool, -1)
 
-matrix = UR5Kin.forward(values = [90, -80, 20, 30, 0, 0])
-sp.pprint(matrix)
+
+
+#matrix = UR5Kin.forward(values = [90, -80, 20, 30, 0, 0])
+#sp.pprint(matrix)
 #print()
 #sp.pprint(matrix[0:3, 0:3])
 print()
-sp.pprint(UR5Kin.MatrixToAngleAxis(matrix[0:3, 0:3]))
+#sp.pprint(UR5Kin.MatrixToAngleAxis(matrix[0:3, 0:3]))
 
 k = [0.3379, 0.4808, 0.8093, 21.8583*math.pi/180]#*math.pi/180]
-
 r = UR5Kin.AngleAxisToMatrix(k)
 #sp.pprint(r)
 #print()
 #sp.pprint(UR5Kin.MatrixToAngleAxis(r))
 
+
 UR5KinS.getJointsFromPose([0,0,0,30,40,50])
+

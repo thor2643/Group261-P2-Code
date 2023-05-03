@@ -12,6 +12,8 @@ class KinematicsSilas:
     forwardMatrix = None
     forward_symbols = []
 
+    theta_1, theta_2, theta_3, theta_4, theta_5, theta_6 = symbols("theta_1, theta_2, theta_3, theta_4, theta_5, theta_6")
+
     pi = 3.14159265359
 
     def setDHParams(self, dh_list):
@@ -102,52 +104,46 @@ class KinematicsSilas:
 
         return R_matrix
 
+    def getTransformationMatrix(self, alpha, a, d, theta):
+        matrix = sp.Matrix([[sp.cos(theta*self.pi/180),  -sp.sin(theta*self.pi/180),  0,  a],
+                                    [sp.sin(theta*self.pi/180)*sp.cos(theta*self.pi/180),  sp.cos(theta*self.pi/180)*sp.cos(alpha*self.pi/180),  -sp.sin(alpha*self.pi/180),  -sp.sin(alpha*self.pi/180)*d],
+                                    [sp.sin(theta*self.pi/180)*sp.sin(alpha*self.pi/180), sp.cos(theta*self.pi/180)*sp.sin(alpha*self.pi/180),  sp.cos(alpha*self.pi/180),  sp.cos(alpha*self.pi/180)*d],
+                                    [0, 0, 0, 1]
+                                    ])
+        return matrix
 
-    # DH parameters for UR5 robot
-    theta_1, theta_2, theta_3, theta_4, theta_5, theta_6 = symbols("theta_1, theta_2, theta_3, theta_4, theta_5, theta_6")
-    DH_Params_UR5 = [[0,0,0,theta_1],[-pi/2,0,0,theta_2],[0,425,0,theta_3],[0,392.25,109.15,theta_4],[-pi/2,0,94.65,theta_5],[pi/2,0,0,theta_6]]
+
     def getJointsFromPose(self, pose):
-        pose = [x, y, z, roll, pitch, yaw]
+        # DH parameters for UR5 robot
+        DH_Params_UR5 = [[0,0,0,self.theta_1],[-pi/2,0,0,self.theta_2],[0,425,0,self.theta_3],[0,392.25,109.15,self.theta_4],[-pi/2,0,94.65,self.theta_5],[pi/2,0,0,self.theta_6]]
+        #pose = [x, y, z, roll, pitch, yaw]
 
-        pose_Transformation_Matrix = sp.Matrix([cos(pose[4]) * sp.cos(pose[5]), sp.sin(pose[3]) * sp.sin(pose[4]) * sp.cos(pose[5]) - sp.cos(pose[3]) * sp.sin(pose[5]), sp.cos(pose[3]) * sp.sin(pose[4]) * sp.cos(pose[5]) + sp.sin(pose[3]) * sp.sin(pose[5]), pose[0]],
-        [sp.cos(pose[4]) * sp.sin(pose[5]), sp.sin(pose[3]) * sp.sin(pose[4]) * sp.sin(pose[5]) + sp.cos(pose[3]) * sp.cos(pose[5]), sp.cos(pose[3]) * sp.sin(pose[4]) * sp.sin(pose[5]) - sp.sin(pose[3]) * sp.cos(pose[5]), pose[1]],
-        [-sp.sin(pose[4]), sp.sin(pose[3]) * sp.cos(pose[4]), sp.cos(pose[3]) * sp.cos(pose[4]), pose[2]],
-        [0, 0, 0, 1])
+
+        pose_Transformation_Matrix = sp.Matrix([[cos(pose[4]) * sp.cos(pose[5]), sp.sin(pose[3]) * sp.sin(pose[4]) * sp.cos(pose[5]) - sp.cos(pose[3]) * sp.sin(pose[5]), sp.cos(pose[3]) * sp.sin(pose[4]) * sp.cos(pose[5]) + sp.sin(pose[3]) * sp.sin(pose[5]), pose[0]],
+                                               [sp.cos(pose[4]) * sp.sin(pose[5]), sp.sin(pose[3]) * sp.sin(pose[4]) * sp.sin(pose[5]) + sp.cos(pose[3]) * sp.cos(pose[5]), sp.cos(pose[3]) * sp.sin(pose[4]) * sp.sin(pose[5]) - sp.sin(pose[3]) * sp.cos(pose[5]), pose[1]],
+                                               [-sp.sin(pose[4]), sp.sin(pose[3]) * sp.cos(pose[4]), sp.cos(pose[3]) * sp.cos(pose[4]), pose[2]],
+                                               [0, 0, 0, 1]])
         
-        T_base_0 = sp.Matrix([-1, 0, 0, 0],
+        T_base_0 = sp.Matrix([[-1, 0, 0, 0],
                             [0, -1, 0, 0],
                             [0, 0, 1, 89.159],
-                            [0, 0, 0, 1])
+                            [0, 0, 0, 1]])
 
-        T_6_tool= sp.Matrix([-1, 0, 0, 0],
+        T_6_tool= sp.Matrix([[-1, 0, 0, 0],
                             [0, -1, 0, 0],
                             [0, 0, 1, 82.3],
-                            [0, 0, 0, 1])
+                            [0, 0, 0, 1]])
 
-        T_0_6 = (T_base_0**-1) * (pose_Transformation_Matrix) * (T_6_tool**-1)
-
-        T_0_1 = setDHParams(DH_Params_UR5[0])
-        T_1_2 = setDHParams(DH_Params_UR5[1])
-        T_2_3 = setDHParams(DH_Params_UR5[2])
-        T_4_5 = setDHParams(DH_Params_UR5[4])
-        T_5_6 = setDHParams(DH_Params_UR5[5])
+        T06 = (T_base_0**-1) * (pose_Transformation_Matrix) * (T_6_tool**-1)
+        T_0_6 = sp.Matrix(T06)
 
         a_2 = DH_Params_UR5[3][2]
         a_3 = DH_Params_UR5[4][2]
         d_4 = DH_Params_UR5[4][3]
         d_5 = DH_Params_UR5[5][3]
 
-        r_11, r_21, r_31, r_12, r_22, r_32, r_13, r_23, r_33 = T_0_6[1,1], T_0_6[2,1], T_0_6[3,1], T_0_6[1,2], T_0_6[2,2], T_0_6[3,2], T_0_6[1,3], T_0_6[2,3], T_0_6[3,3]
-        x_0_6, y_0_6, z_0_6 = T_0_6[1,4], T_0_6[2,4], T_0_6[3,4] 
-
-        angles = [[theta_1_a,theta_2_a,theta_3_a,theta_4_a,theta_5_a,theta_6_a],
-                 [theta_1_a,theta_2_b,theta_3_b,theta_4_b,theta_5_a,theta_6_a],
-                 [theta_1_a,theta_2_c,theta_3_c,theta_4_c,theta_5_b,theta_6_b],
-                 [theta_1_a,theta_2_d,theta_3_d,theta_4_d,theta_5_b,theta_6_b],
-                 [theta_1_b,theta_2_e,theta_3_e,theta_4_e,theta_5_c,theta_6_c],
-                 [theta_1_b,theta_2_f,theta_3_f,theta_4_f,theta_5_c,theta_6_c],
-                 [theta_1_b,theta_2_g,theta_3_g,theta_4_g,theta_5_d,theta_6_d],
-                 [theta_1_b,theta_2_h,theta_3_h,theta_4_h,theta_5_d,theta_6_d]]
+        r_11, r_21, r_31, r_12, r_22, r_32, r_13, r_23, r_33 = T_0_6[0,0], T_0_6[1,0], T_0_6[2,0], T_0_6[0,1], T_0_6[1,1], T_0_6[2,1], T_0_6[0,2], T_0_6[1,2], T_0_6[2,2]
+        x_0_6, y_0_6, z_0_6 = T_0_6[0,3], T_0_6[1,3], T_0_6[2,3] 
 
         # theta 1 - two solutions
         theta_1_a = sp.atan2(y_0_6,x_0_6) + sp.acos(d_4/(sqrt(x_0_6**2+y_0_6**2)))-self.pi/2
@@ -160,30 +156,44 @@ class KinematicsSilas:
         theta_5_c = sp.acos(-r_23*sp.cos(theta_1_b)+r_13*sin(theta_1_b)) # theta_1_b
         theta_5_d = -sp.acos(-r_23*sp.cos(theta_1_b)+r_13*sin(theta_1_b)) # theta_1_b
 
+        angles = [[theta_1_a,0,0,0,theta_5_a,0],
+                 [theta_1_a,0,0,0,theta_5_a,0],
+                 [theta_1_a,0,0,0,theta_5_b,0],
+                 [theta_1_a,0,0,0,theta_5_b,0],
+                 [theta_1_b,0,0,0,theta_5_c,0],
+                 [theta_1_b,0,0,0,theta_5_c,0],
+                 [theta_1_b,0,0,0,theta_5_d,0],
+                 [theta_1_b,0,0,0,theta_5_d,0]]
+
         # theta 6 - four solutions
         for i in range(4):
             r21_T_1_6 = (r_21*sp.cos(angles[i][1]))-(r_11*sp.sin(angles[i][1]))/(sp.sin(angles[i][5]))
             r22_T_1_6 = (r_22*sp.cos(angles[i][1]))-(r_12*sp.sin(angles[i][1]))/(-sp.sin(angles[i][5]))
             th_6 = sp.atan2(r22_T_1_6,r21_T_1_6)
-            angles[2*i-1][6] = th_6
-            angles[2*i][6] = th_6
+            angles[2*i-1][5] = th_6
+            angles[2*i][5] = th_6
 
         # theta 3
-        for i in range(4):
-            T_1 = T_0_1(angles[i][1])
-            T_5 = T_4_5(angles[i][5])
-            T_6 = T_5_6(angles[i][6])
-            T_1_4 = (T_1**-1)*T_0_6*((T_5*T_6)**-1) 
 
-            x_1_4 = T_1_4[1][4]
-            z_1_4 = T_1_4[3][4]
+        for i in range(4):
+            T_0_1 = self.getTransformationMatrix(DH_Params_UR5[0][0],DH_Params_UR5[0][1],DH_Params_UR5[0][2],angles[i][0])
+            T_4_5 = self.getTransformationMatrix(DH_Params_UR5[4][0],DH_Params_UR5[4][1],DH_Params_UR5[4][2],angles[i][4])
+            T_5_6 = self.getTransformationMatrix(DH_Params_UR5[5][0],DH_Params_UR5[5][1],DH_Params_UR5[5][2],angles[i][5])
+            T_1_4 = (T_0_1**-1)*T_0_6*((T_4_5*T_5_6)**-1)
+
+            x_1_4 = T_1_4[0][3]
+            z_1_4 = T_1_4[2][3]
             
-            angles[2*i-1][3] = sp-acos((x_1_4**2+z_1_4**2-a_2**2-a_3**2)/(2*a_2*a_3))
-            angles[2*i][3] = -sp.acos((x_1_4**2+z_1_4**2-a_2**2-a_3**2)/(2*a_2*a_3))
+            angles[2*i-1][2] = sp.acos((x_1_4**2+z_1_4**2-a_2**2-a_3**2)/(2*a_2*a_3))
+            angles[2*i][2] = -sp.acos((x_1_4**2+z_1_4**2-a_2**2-a_3**2)/(2*a_2*a_3))
 
         # theta 2
         for i in range(8):
-            T_1_4 = (T_0_1(angles[i][1])**-1)*T_0_6*(T_4_5(angles[i][5])*T_5_6(angles[i][6]))**-1
+            T2_0_1 = self.getTransformationMatrix(DH_Params_UR5[0][0],DH_Params_UR5[0][1],DH_Params_UR5[0][2],angles[i][0])
+            T2_4_5 = self.getTransformationMatrix(DH_Params_UR5[4][0],DH_Params_UR5[4][1],DH_Params_UR5[4][2],angles[i][4])
+            T2_5_6 = self.getTransformationMatrix(DH_Params_UR5[5][0],DH_Params_UR5[5][1],DH_Params_UR5[5][2],angles[i][5])
+
+            T_1_4 = (T2_0_1**-1)*T_0_6*(T2_4_5*T_5_6)**-1
             x_1_4 = T_1_4[1][4]
             z_1_4 = T_1_4[3][4]
             angles[i][2] = sp.atan2(x_1_4,z_1_4)-sp.asin((a_3*sp.sin(angles[i][3]))/sp.sqrt(x_1_4**2+z_1_4**2))
