@@ -7,7 +7,8 @@ import csv
 import os
 
 last_Line_Number = 0
-data_write = False
+data = True
+dispense_Cycle_Time_Sec = 20
 
 # - - - - - - - - - All initilization of the communication protocols and functions for connection - - - - - - - - - 
 
@@ -16,8 +17,8 @@ arduino_ser = serial.Serial()
 
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# Bind the socket to a specific IP address and port
-server_address = ('172.27.30.88',53432)
+# Bind the socket to a specific IP address and port - thors er '192.168.137.141'
+server_address = ('192.168.0.229',53432)
 sock.bind(server_address)
 # Listen for incoming connections
 sock.listen(1)
@@ -49,7 +50,7 @@ Connect_To_Arduino()
 # - - - - - - - - - All initilization of the .CSV document - - - - - - - - - 
 
 line_Number = 0
-start_Num = '3'
+start_Num = 3
 
 # Define the file name and column headers
 filename = 'OrderList.csv'
@@ -70,15 +71,16 @@ with open(filename, 'a', newline='') as csvfile:
     else:
         # file does not exist or is empty, write header
         writer.writeheader()
-        writer.writerow({'data':1})
-
+        writer.writerow({'data':0})
+        csvfile.seek(0)
+    
 def Update_Data_Row_Reached(line):
     with open(filename, 'r') as csvfile:
         reader = csv.reader(csvfile)
         data_Injection = list(reader)
    
-    # Replace the second row with new data
-    data_Injection[1] = line
+    # Replace the second row with new data. The data has to be a string. A comma seems to arrive when str() is used. Therefore this method is used.
+    data_Injection[1] = str(line).replace(',', '')
 
     # Write the updated data back to the CSV file
     with open(filename, 'w', newline='') as file:
@@ -86,11 +88,6 @@ def Update_Data_Row_Reached(line):
         writer.writerows(data_Injection)
 
 def read_data_from_csv(filename, line_number):
-    global data_write
-    if (data_write):
-        time.sleep(1)
-    
-    data_write = True
     with open(filename, 'r') as csvfile:
         reader = csv.reader(csvfile)
         # Skip the header row
@@ -98,39 +95,38 @@ def read_data_from_csv(filename, line_number):
         # Skip all rows until we reach the desired row number
         for i in range(line_number - 2):
             next(reader)
-        # Return the data from the desired row
-        row = next(reader)
-
-        txt = row[0]
-        x = [int(num) for num in txt.split(', ')]
-
-        # Check if current row is the last row in the file
-        is_last_row = True
+        
+        # Check if there are more rows in the file
         try:
-            next(reader)
+            row = next(reader)
             is_last_row = False
         except StopIteration:
             is_last_row = True
-            pass
+            row = []
+       
+        if row == ['3']:
+            row = ''
 
-    data_write = False
+        txt = row[0] if row else ''
+        x = []
+        if txt.strip():
+            x = [int(num) for num in txt.split(', ')]
 
-    if not is_last_row:
-        line_number += 1
+        # Adjust the line_number if there are more rows in the file
+        line_number += 1 if not is_last_row else 0
 
-    line_Number = line_number
+    return x, line_number
 
-    return x, line_Number
 
 
 #Find out what line number which the program reached last time it was run. In the document "data" is the header, and on line 2 the value of the last reached data line is found.
-#The default value is 3, as the first two lines are occoupied.
+#The default value is 3, as the first two lines are occupied.
 with open(filename, "r") as csvfile:
     reader = csv.reader(csvfile)
     # Skip the header row
     next(reader)
     row = next(reader)
-    line_Number = int(row[0])
+    line_Number = int(row[0]) # There is a conversion error some place. That makes a double digits in the document become a comma separeted value
 
 Update_Data_Row_Reached(start_Num)
 
@@ -207,16 +203,13 @@ def Receive_From_Pc():
                 data = connection.recv(16)
                 print('Received:', data.decode())
                 if data:
-                    if data_write:
-                        time.sleep(1)
 
-                    data_write = True
                     # Save the received data to the CSV file
                     with open(filename, 'a', newline='') as csvfile:
                         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
                         writer.writerow({'data': data.decode()})
                     connection.sendall(data)
-                    data_write = False
+
                 else:
                     break
         finally:
@@ -224,14 +217,18 @@ def Receive_From_Pc():
             connection.close()
 
 def Main_controller(line_Number, last_Line_Number):
+    last_Line_Number = line_Number
+    
     phone_assembly, line_Number = read_data_from_csv(filename, line_Number)
-    if line_Number > last_Line_Number:
-        last_Line_Number = line_Number
+    
+    if line_Number > last_Line_Number and phone_assembly:
         Double_Digit = Conversion_Arr_To_DD(phone_assembly)   
-
+            
         for i in range(phone_assembly[3]):
             Send_To_Arduino(Double_Digit)
-            time.sleep(2)   
+            time.sleep(dispense_Cycle_Time_Sec)
+        
+        Update_Data_Row_Reached(line_Number)
     else:
         #print('No new number')
         pass
@@ -251,5 +248,5 @@ while True:
     #print('Main controller received this line number:' + str(line_Number))
     line_Number, last_Line_Number = Main_controller(line_Number, last_Line_Number)
 
-#close the thread
+#close the thread - This part of the code cannot be reached. This is on purpose, as we at all times want to have the server opened if the program is running. 
 pc_thread.join()

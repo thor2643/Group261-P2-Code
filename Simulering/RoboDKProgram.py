@@ -171,6 +171,29 @@ class RoboDKProgram:
 
     def add_moveL(self, joints):
         self.program.MoveJ(joints, blocking=False)
+
+    def add_target(self, pose, name, setAsjoint=True):
+        """Adds a target and returns the target object"""
+        target = self.RDK.AddTarget(f"{name} target", self.ref_frame)
+
+        if isinstance(pose, list):
+            target.setJoints(pose)
+        else:
+            target.setPose(pose)
+        
+        if setAsjoint:
+            target.setAsJointTarget()
+        
+        return target
+
+
+    def get_ref_pose(self):
+        return self.ref_pose
+    
+    def set_IO(self, pin, val):
+        self.program.setDO(pin, val)
+
+        self.program.setInstruction
     
 
     def run(self):
