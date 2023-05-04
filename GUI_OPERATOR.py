@@ -13,8 +13,6 @@ root.geometry("1200x750+200+0") # width, height, placement on screen
 root.title("Control GUI")
 Dispensor_number=[0,0,0,0,0,0,0,0] #0 PCB, 1 fuses, 2-4: top cover colors, 5-7: bot cover colors.
 
-
-
 main_frame = tk.Frame(root, bg='#F0F0F0')
 main_frame.pack(fill=tk.BOTH, expand=True)
 
