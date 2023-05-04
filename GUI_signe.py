@@ -246,7 +246,7 @@ amount = tk.Entry(root)
 amount_label.place(x=645,y=25)
 amount.place(x=650,y=50)
 
-amount_btn=tk.Button(root,text= 'Chose amount',
+amount_btn=tk.Button(root,text= 'Choose amount',
                      font=('Bold',8),
                      bg='white',
                      relief=GROOVE,
