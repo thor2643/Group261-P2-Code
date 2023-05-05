@@ -5,6 +5,7 @@ import threading
 import socket
 import csv
 import os
+#from GUI_OPERATOR import OperatorGUI
 
 last_Line_Number = 0
 data = True
@@ -18,7 +19,7 @@ arduino_ser = serial.Serial()
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Bind the socket to a specific IP address and port - thors er '192.168.137.141'
-server_address = ('192.168.137.141',53432)
+server_address = ('192.168.0.229',53432)
 sock.bind(server_address)
 # Listen for incoming connections
 sock.listen(1)
@@ -53,29 +54,42 @@ line_Number = 0
 start_Num = 3
 
 # Define the file name and column headers
-filename = 'OrderList.csv'
-fieldnames = ['data']
+filename = ['OrderList.csv', 'StatusList.csv' ]
+fieldnames = ['data'], ['data_s']
 
-delete_File = input("Do you want to delete the CSV file? (y/n)").lower() == 'y'
+delete_File_1 = input("Do you want to delete the list of orders? (y/n)").lower() == 'y'
+delete_File_2 = input("Do you want to delete the file containing the current inventory status? (y/n)").lower() == 'y'
+
 
 # Delete the CSV file if it exists, and the delete_File variable is true
-if delete_File and os.path.exists(filename):
-    os.remove(filename)
+if delete_File_1 and os.path.exists(filename[0]):
+    os.remove(filename[0])
 
-# Open the CSV file in 'append' mode and write the header row if the file is empty/none empty
-with open(filename, 'a', newline='') as csvfile:
-    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-    if os.path.exists(filename) and os.stat(filename).st_size > 0:
-        # file exists and is not empty, do nothing
-        pass
-    else:
-        # file does not exist or is empty, write header
-        writer.writeheader()
-        writer.writerow({'data':0})
-        csvfile.seek(0)
+if delete_File_2 and os.path.exists(filename[1]):
+    os.remove(filename[1])
+
+# Open the .csv files in 'append' mode and write the header row if the file is empty/none empty
+for i in range(len(filename)):
+    with open(filename[i], 'a', newline='') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames[i])
+        
+        if os.path.exists(filename[i]) and os.stat(filename[i]).st_size > 0:
+            # file exists and is not empty, do nothing
+            pass
+        else:
+            # file does not exist or is empty, write header
+            writer.writeheader()
+            if i == 0:
+                writer.writerow({'data': 0})
+            else:
+                writer.writerow({'data_s': 0})
+                for i in range(7):
+                    writer.writerow({'data_s': 0 })
+
+            csvfile.seek(0)
     
-def Update_Data_Row_Reached(line):
-    with open(filename, 'r') as csvfile:
+def Update_Data_Row_Reached(line,File_Number):
+    with open(filename[File_Number], 'r') as csvfile:
         reader = csv.reader(csvfile)
         data_Injection = list(reader)
    
@@ -83,12 +97,26 @@ def Update_Data_Row_Reached(line):
     data_Injection[1] = str(line).replace(',', '')
 
     # Write the updated data back to the CSV file
-    with open(filename, 'w', newline='') as file:
+    with open(filename[0], 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerows(data_Injection)
 
-def read_data_from_csv(filename, line_number):
-    with open(filename, 'r') as csvfile:
+def Update_Component_Status():
+    with open(filename[1], 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        data_Injection = list(reader)
+
+    for i in range(7):
+        data_Injection[i + 2] = '0'
+    
+    # Write the updated data back to the CSV file
+    with open(filename[0], 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerows(data_Injection)
+    
+
+def read_data_from_csv(File_Number, line_number):
+    with open(filename[File_Number], 'r') as csvfile:
         reader = csv.reader(csvfile)
         # Skip the header row
         next(reader)
@@ -104,6 +132,7 @@ def read_data_from_csv(filename, line_number):
             is_last_row = True
             row = []
        
+        #An error occured, where an array where only ['3'] would be present would be passed. If this occours, it is set to empty. The rest of the code, can handle that gracefully.
         if row == ['3']:
             row = ''
 
@@ -118,17 +147,19 @@ def read_data_from_csv(filename, line_number):
     return x, line_number
 
 
-
+#The next line of code will setup the documents, so that they are in a state ready to get the formated information.
 #Find out what line number which the program reached last time it was run. In the document "data" is the header, and on line 2 the value of the last reached data line is found.
 #The default value is 3, as the first two lines are occupied.
-with open(filename, "r") as csvfile:
+with open(filename[0], "r") as csvfile:
     reader = csv.reader(csvfile)
     # Skip the header row
     next(reader)
     row = next(reader)
-    line_Number = int(row[0]) # There is a conversion error some place. That makes a double digits in the document become a comma separeted value
+    line_Number = int(row[0]) # There is a conversion error some place. That makes a double digits in the document become a comma separeted value  
+  
+Update_Data_Row_Reached(start_Num,0)
 
-Update_Data_Row_Reached(start_Num)
+
 
 # - - - - - - - - - Function to convert array to "more" useful information. - - - - - - - - -
 
@@ -176,8 +207,7 @@ def Conversion_Arr_To_DD(array):
 
     except (TypeError, IndexError):
         print('Invalid input values. The input array must contain 4 integers.') 
-
-    
+  
 # - - - - - - - - - Function to append and receive data. From both the arduino, but also the PC - - - - - - - - -
 
 # Function to send data to the Arduino
@@ -205,8 +235,8 @@ def Receive_From_Pc():
                 if data:
 
                     # Save the received data to the CSV file
-                    with open(filename, 'a', newline='') as csvfile:
-                        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                    with open(filename[0], 'a', newline='') as csvfile:
+                        writer = csv.DictWriter(csvfile, fieldnames=fieldnames[0])
                         writer.writerow({'data': data.decode()})
                     connection.sendall(data)
 
@@ -216,10 +246,12 @@ def Receive_From_Pc():
             # Clean up the connection
             connection.close()
 
+# - - - - - - - - - Main controller function and instantiation of the OperatorGUI - - - - - - - - -
+
 def Main_controller(line_Number, last_Line_Number):
     last_Line_Number = line_Number
     
-    phone_assembly, line_Number = read_data_from_csv(filename, line_Number)
+    phone_assembly, line_Number = read_data_from_csv(0, line_Number)
     
     if line_Number > last_Line_Number and phone_assembly:
         Double_Digit = Conversion_Arr_To_DD(phone_assembly)   
@@ -228,20 +260,23 @@ def Main_controller(line_Number, last_Line_Number):
             Send_To_Arduino(Double_Digit)
             time.sleep(dispense_Cycle_Time_Sec)
         
-        Update_Data_Row_Reached(line_Number)
+        Update_Data_Row_Reached(line_Number,0)
     else:
         #print('No new number')
         pass
     return line_Number, last_Line_Number
 
+#GUIOperator = OperatorGUI()
 
 # - - - - - - - - - Threading - - - - - - - - -
 
 # Create a thread for receiving data from the PC
+#GUI_Operator_thread = threading.Thread(target=GUIOperator.Run_Operator_GUI)
 pc_thread = threading.Thread(target=Receive_From_Pc)
 
 # Start thread
 pc_thread.start()
+#GUI_Operator_thread.start()
 
 # - - - - - - - - - Main Code - - - - - - - - -
 while True:
@@ -250,3 +285,4 @@ while True:
 
 #close the thread - This part of the code cannot be reached. This is on purpose, as we at all times want to have the server opened if the program is running. 
 pc_thread.join()
+#GUI_Operator_thread.join()
