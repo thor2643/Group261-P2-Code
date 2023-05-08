@@ -8,6 +8,10 @@ UR5KinS = kms.KinematicsSilas()
 sp.init_printing()
 t1, t2, t3, t4, t5, t6 = sp.symbols("t1, t2, t3, t4, t5, t6")
 
+test = UR5KinS.getJointsFromPose([309.5,-109.3,608.95,30,40,50])
+print(test)
+
+"""
 
 dh_params = [[0, 0, 0, t1],
              [90, 0, 0, t2-180],
@@ -51,5 +55,5 @@ r = UR5Kin.AngleAxisToMatrix(k)
 #sp.pprint(UR5Kin.MatrixToAngleAxis(r))
 
 
-UR5KinS.getJointsFromPose([0,0,0,30,40,50])
+"""
 
