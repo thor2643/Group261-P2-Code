@@ -2,6 +2,12 @@ import tkinter as tk
 from tkinter import *
 import csv
 import os
+# time function used to calculate time
+from time import time
+
+print('Running...')
+# Calculating starting time
+start = time()
 
 #variables and arrays:
 count=0
@@ -35,6 +41,7 @@ page_1_lb=tk.Label(page_1, text='Control Center', font=('Times New Roman',50,'bo
 page_1_lb.grid(row=0,  column=0, columnspan=4, padx=5,  pady=5)
 message_Alert=tk.Label(page_1, text='You will be alerted if refill is needed:', font=('Times New Roman',20,'bold'),bg='#F0F0F0')
 message_Alert.grid(row=1,  column=0, columnspan=4, padx=20,  pady=20)
+
 
 #frame setup for page 1:
 PCB_frame  =  Frame(page_1,  width=300,  height= 200,  bg='white', highlightbackground="black", highlightthickness=2)
@@ -328,7 +335,13 @@ def Refill(): #Moves to next page
     page = pages[count]
     page.pack()
     entry_eq_0()
+    root.after(5000, Update_Over_Time)
     
+def Update_Over_Time():
+    Read_CSV()
+    Update_Numbers()
+    Check_If_Refill_Needed()
+    print('Updated')
     
 def Start(): #Moves to next page
     global count
@@ -348,6 +361,7 @@ def Start_Update():
     Start()
     Update_Numbers()
     Check_If_Refill_Needed()
+    page_1.after(5000, Update_Over_Time)
     
 def Move_back_page():
     global count
@@ -359,16 +373,11 @@ def Move_back_page():
     page = pages[count]
     page.pack()
     Update_Numbers()
-    print('før write')
-    print(Dispensor_number)
     Write_Csv(Dispensor_number)
-    print('efter Write')
-    print(Dispensor_number)
     Dispensor_number=Read_CSV()
-    print('efter read:')
-    print(Dispensor_number)
     return Dispensor_number
     
+
 #entry variables
 entry_values=[0,0,0,0,0,0,0,0] 
 
@@ -403,12 +412,14 @@ def Add():
     Move_back_page()
     Clear_Entry()
     Check_If_Refill_Needed()
+    root.after(5000, Update_Over_Time)
     
 def Rem():
     Calculate(2)
     Move_back_page()
     Clear_Entry()
     Check_If_Refill_Needed()
+    root.after(5000, Update_Over_Time)
     
 def Check_If_Refill_Needed():
     if Dispensor_number[0] < 5:
@@ -477,7 +488,5 @@ remove_btn = tk.Button(page_2, text='Remove',
                      command=Rem
                      )
 remove_btn.place(x=555,y=200)
-
-
 
 root.mainloop()
