@@ -1,5 +1,7 @@
 import tkinter as tk
 from tkinter import *
+import csv
+import os
 
 #variables and arrays:
 count=0
@@ -11,7 +13,10 @@ root.minsize(200, 200)  # width, height
 root.maxsize(1200, 750)
 root.geometry("1200x750+200+0") # width, height, placement on screen 
 root.title("Control GUI")
-Dispensor_number=[0,0,0,0,0,0,0,0] #0 PCB, 1 fuses, 2-4: top cover colors, 5-7: bot cover colors.
+Dispensor_number = [0,0,0,0,0,0,0,0] #0 PCB, 1 fuses, 2-4: top cover colors, 5-7: bot cover colors.
+filename = 'StatusList.csv'
+fieldnames ='data_s'
+
 
 main_frame = tk.Frame(root, bg='#F0F0F0')
 main_frame.pack(fill=tk.BOTH, expand=True)
@@ -241,6 +246,32 @@ page = pages[count]
 page.pack()
 
 #funktions:  
+def Read_CSV(component_List):
+    #Function to read
+    with open(filename, 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        data_csv = list(reader)
+        
+        for i in range(8):
+            component_List[i] = int(data_csv[i + 2])
+    return component_List
+            
+def Write_Csv(component_List):
+    #Function to read and write
+    with open(filename, 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        data_Injection = list(reader)
+        
+        for i in range(8):
+            data_Injection[i + 2] = str(int(component_List[i]))
+    
+    with open(filename[0], 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerows(data_Injection)
+
+def Send_Change_in_Disp():
+    print(Dispensor_number)
+
 def entry_eq_0():
     PCB_entry.insert(0,'0')
     PCB_entry.bind('<FocusIn>', remove_0(PCB_entry))
@@ -265,7 +296,7 @@ def entry_eq_0():
 
     bot_cov_white_entry.insert(0,'0')
     bot_cov_white_entry.bind('<FocusIn>', remove_0(bot_cov_white_entry))
-  
+
 def Update_Numbers():
     PCB_number.configure(text= str(Dispensor_number[0]))
     PCB_number.pack()
@@ -335,6 +366,7 @@ def Add():
     Move_back_page()
     Clear_Entry()
     Check_If_Refill_Needed()
+    Send_Change_in_Disp()
     
 def Rem():
     Calculate(2)
@@ -398,5 +430,13 @@ remove_btn = tk.Button(page_2, text='Remove',
                      command=Rem
                      )
 remove_btn.place(x=555,y=200)
+
+#Kode som skal køres til start
+with open(filename, 'a', newline='') as csvfile:
+    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    Update_Numbers()
+    print('start')
+Read_CSV(Dispensor_number)
+Update_Numbers()
 
 root.mainloop()
