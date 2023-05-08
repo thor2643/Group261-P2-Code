@@ -266,6 +266,9 @@ def Read_CSV():
         component_List=[0,0,0,0,0,0,0,0]
         reader = csv.reader(csvfile)
         data_csv = list(reader)
+        for i in range(len(data_csv)):
+            data_csv[i] = str(data_csv[i]).strip('[]').replace(",", "").replace("'", "").replace(" ", "")
+        print(data_csv)
 
         for i in range(8):
             component_List[i] = int(str(data_csv[i + 1]).strip('[]').replace("'",""))
@@ -277,6 +280,9 @@ def Write_Csv(component_List):
     with open(filename, 'r') as csvfile:
         reader = csv.reader(csvfile)
         data_Injection = list(reader)
+        for i in range(len(data_Injection)):
+            data_Injection[i] = str(data_Injection[i]).strip('[]').replace(",", "").replace("'", "").replace(" ", "")
+        print(data_Injection)
         
         for i in range(8):
             data_Injection[i + 1] = str(int(component_List[i]))
@@ -361,7 +367,7 @@ def Start_Update():
     Start()
     Update_Numbers()
     Check_If_Refill_Needed()
-    page_1.after(5000, Update_Over_Time)
+    page_1.after(10000, Update_Over_Time)
     
 def Move_back_page():
     global count
@@ -412,14 +418,14 @@ def Add():
     Move_back_page()
     Clear_Entry()
     Check_If_Refill_Needed()
-    root.after(5000, Update_Over_Time)
+    root.after(10000, Update_Over_Time)
     
 def Rem():
     Calculate(2)
     Move_back_page()
     Clear_Entry()
     Check_If_Refill_Needed()
-    root.after(5000, Update_Over_Time)
+    root.after(10000, Update_Over_Time)
     
 def Check_If_Refill_Needed():
     if Dispensor_number[0] < 5:
