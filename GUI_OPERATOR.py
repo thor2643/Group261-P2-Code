@@ -11,7 +11,9 @@ root.minsize(200, 200)  # width, height
 root.maxsize(1200, 750)
 root.geometry("1200x750+200+0") # width, height, placement on screen 
 root.title("Control GUI")
-Dispensor_number=[0,0,0,0,0,0,0,0] #0 PCB, 1 fuses, 2-4: top cover colors, 5-7: bot cover colors.
+Dispensor_number = [0,0,0,0,0,0,0,0] #0 PCB, 1 fuses, 2-4: top cover colors, 5-7: bot cover colors.
+file_name = ['Statuslist.csv']
+
 
 main_frame = tk.Frame(root, bg='#F0F0F0')
 main_frame.pack(fill=tk.BOTH, expand=True)
@@ -241,6 +243,9 @@ page = pages[count]
 page.pack()
 
 #funktions:  
+def Send_Change_in_Disp():
+    print(Dispensor_number)
+
 def entry_eq_0():
     PCB_entry.insert(0,'0')
     PCB_entry.bind('<FocusIn>', remove_0(PCB_entry))
@@ -265,7 +270,7 @@ def entry_eq_0():
 
     bot_cov_white_entry.insert(0,'0')
     bot_cov_white_entry.bind('<FocusIn>', remove_0(bot_cov_white_entry))
-  
+
 def Update_Numbers():
     PCB_number.configure(text= str(Dispensor_number[0]))
     PCB_number.pack()
@@ -335,6 +340,7 @@ def Add():
     Move_back_page()
     Clear_Entry()
     Check_If_Refill_Needed()
+    Send_Change_in_Disp()
     
 def Rem():
     Calculate(2)

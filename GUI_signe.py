@@ -121,7 +121,7 @@ def move_next_page():
     if count ==4: 
         print(phone)
         print('---------------sendt----------------------')
-        Send_Data()
+        Get_Data()
         
     color_chosen()
     #chosen_amount.configure(text='Amount of phones: ' + str(amount_chosen))
@@ -207,7 +207,7 @@ def Amount():
         amount_label.place(x=645,y=25)
 
 #Funktion for COMUNIKATION:    
-def Send_Data():
+def Get_Data():
     # Create a TCP/IP socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
