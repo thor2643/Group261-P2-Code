@@ -5,10 +5,9 @@ import threading
 import socket
 import csv
 import os
-#from GUI_OPERATOR import OperatorGUI
+
 
 last_Line_Number = 0
-dispense_Cycle_Time_Sec = 20
 
 #Definition of our alarm and emergency stop parameters. The values are stores in arrays
 component_Alarm_List = [5,41,5,5,5,5,5,5]
@@ -22,7 +21,7 @@ arduino_ser = serial.Serial()
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Bind the socket to a specific IP address and port - thors er '192.168.137.141'
-server_address = ('172.26.51.186',53432)
+server_address = ('192.168.137.141',53432)
 sock.bind(server_address)
 # Listen for incoming connections
 sock.listen(1)
@@ -46,6 +45,13 @@ def Connect_To_Arduino():
         else:
             print("No Arduino board found. Please make sure it is connected.")
             time.sleep(5) 
+
+def Receive_data_Arduino():
+    data = arduino_ser.readline().decode().strip()
+    if data == "Process complete!":
+        return True
+    else:
+        return False
 
 #Connects to the arduino and pc
 Connect_To_Arduino()
@@ -306,7 +312,8 @@ def Main_controller(line_Number, last_Line_Number):
                 #Add something that checks the amount of components.
                 Update_Component_Status(phone_assembly)
                 Send_To_Arduino(Double_Digit)
-                time.sleep(dispense_Cycle_Time_Sec)
+                while not Receive_data_Arduino():
+                    pass
                 Update_Data_Row_Reached(line_Number,0)
             else:
                 print('A stop has been engaged, as there are not enough components to build a phone')
@@ -317,12 +324,10 @@ def Main_controller(line_Number, last_Line_Number):
 
     return line_Number, last_Line_Number
 
-#GUIOperator = OperatorGUI()
 
 # - - - - - - - - - Threading - - - - - - - - -
 
 # Create a thread for receiving data from the PC
-#GUI_Operator_thread = threading.Thread(target=GUIOperator.Run_Operator_GUI)
 pc_thread = threading.Thread(target=Receive_From_Pc)
 
 # Start thread
@@ -336,4 +341,3 @@ while True:
 
 #close the thread - This part of the code cannot be reached. This is on purpose, as we at all times want to have the server opened if the program is running. 
 pc_thread.join()
-#GUI_Operator_thread.join()

@@ -63,6 +63,7 @@ void loop() {
 
     if (Is_Valid_Input(temp_Num)) {
       Stepper_Drive(digits[1], digits[0]);
+      Serial.println("Process complete!");
     }
     else {
       Serial.println("Invalid input");
