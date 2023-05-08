@@ -22,7 +22,7 @@ arduino_ser = serial.Serial()
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Bind the socket to a specific IP address and port - thors er '192.168.137.141'
-server_address = ('192.168.137.141',53432)
+server_address = ('172.26.51.186',53432)
 sock.bind(server_address)
 # Listen for incoming connections
 sock.listen(1)
@@ -94,7 +94,7 @@ def Update_Data_Row_Reached(line,File_Number):
         data_Injection = list(reader)
    
     # Replace the second row with new data. The data has to be a string. A comma seems to arrive when str() is used. Therefore this method is used.
-    data_Injection[1] = str(line).replace(',', '')
+    data_Injection[1] = str(line)
 
     # Write the updated data back to the CSV file
     with open(filename[0], 'w', newline='') as file:
@@ -106,15 +106,19 @@ def Update_Component_Status(Orderlist):
         reader = csv.reader(csvfile)
         data_Injection = list(reader)
         
-        data_Injection[1] = str(int(str(data_Injection[1]).strip('[]').replace("'","")) - 1)
-        data_Injection[2] = str(int(str(data_Injection[2]).strip('[]').replace("'","")) - Orderlist[1] )
+        for i in range(len(data_Injection)):
+            data_Injection[i] = str(data_Injection[i]).strip('[]').replace(",", "").replace("'", "").replace(" ", "")
+        print(data_Injection)
+
+        data_Injection[1] = str(int(data_Injection[1]) - 1)
+        data_Injection[2] = str(int(data_Injection[2])- Orderlist[1] )
 
        # First a dictionary is defined, which is used to map Orderlist values to data_Injection indices
         indices = {0: 3, 1: 4, 2: 5}
-        data_Injection[indices[Orderlist[0]]] = str(int(str(data_Injection[indices[Orderlist[0]]]).strip('[]').replace("'","")) - 1)
+        data_Injection[indices[Orderlist[0]]] = str(int(data_Injection[indices[Orderlist[0]]]) - 1)
 
         indices = {0: 6, 1: 7, 2: 8}
-        data_Injection[indices[Orderlist[2]]] = str(int(str(data_Injection[indices[Orderlist[2]]]).strip('[]').replace("'","")) - 1)
+        data_Injection[indices[Orderlist[2]]] = str(int(data_Injection[indices[Orderlist[2]]]) - 1)
 
     # Write the updated data back to the CSV file
     with open(filename[1], 'w', newline='') as file:
@@ -129,7 +133,7 @@ def Check_Component_status():
 
         #Check if there are any components left, if not then it will stop
         for i in range(len(component_Alarm_List)):
-            if int(str(component_list[i+1]).strip('[]').replace("'","")) <= component_EStop_List[i]:
+            if int(str(component_list[i+1]).strip('[]').replace("'","").replace(", ","")) <= component_EStop_List[i]:
                 EStop = True
                 break
             else:
@@ -137,7 +141,7 @@ def Check_Component_status():
 
         #Check if there are any components left, if not then it will stop
         for i in range(len(component_Alarm_List)):
-            if int(str(component_list[i+1]).strip('[]').replace("'","")) < component_Alarm_List[i]:
+            if int(str(component_list[i+1]).strip('[]').replace("'","").replace(", ","")) < component_Alarm_List[i]:
                 Alarm = True
                 break
             else:
@@ -179,19 +183,29 @@ def read_data_from_csv(File_Number, line_number):
 #The next line of code will setup the documents, so that they are in a state ready to get the formated information.
 #Find out what line number which the program reached last time it was run. In the document "data" is the header, and on line 2 the value of the last reached data line is found.
 #The default value is 3, as the first two lines are occupied.
+
+with open(filename[0], 'r') as csvfile:
+    reader = csv.reader(csvfile)
+    data_Injection = list(reader)
+
+    print(data_Injection[1])
+
+    if data_Injection[1] == ['0']:
+        Update_Data_Row_Reached(start_Num,0)
+
 with open(filename[0], "r") as csvfile:
     reader = csv.reader(csvfile)
     # Skip the header row
     next(reader)
     row = next(reader)
-    line_Number = int(row[0]) # There is a conversion error some place. That makes a double digits in the document become a comma separeted value  
+    line_Number = int(row[0]) 
   
-Update_Data_Row_Reached(start_Num,0)
+
 
 # - - - - - - - - - Function to convert array to "more" useful information. - - - - - - - - -
 
 def Conversion_Arr_To_DD(array):
-    #The array phone_assembly consist of 4 entries. The first (0) and the third (2) entries describe the corvers. 
+    #The array phone_assembly consist of 4 entries. The first (0) and the third (2) entries describe the covers. 
     # If the value is 0 then it is black. If the value is 1 then it is white, and lastly the cover it blue if the value is 2 
     # We firstly handle the topcover
 
@@ -295,10 +309,12 @@ def Main_controller(line_Number, last_Line_Number):
                 time.sleep(dispense_Cycle_Time_Sec)
                 Update_Data_Row_Reached(line_Number,0)
             else:
+                print('A stop has been engaged, as there are not enough components to build a phone')
                 break     
     else:
         #print('No new number')
         pass
+
     return line_Number, last_Line_Number
 
 #GUIOperator = OperatorGUI()
