@@ -320,14 +320,14 @@ def Update_Numbers(): #Updates the numbers according to Dispensor_number on page
     bot_cov_number.configure(text= str(Dispensor_number[5]) + "             " + str(Dispensor_number[6]) + "            " + str(Dispensor_number[7]),)
     bot_cov_number.pack()
     
-def Clear_Entry():
+def Clear_Entry(): #Emties all entrys
     for i in entry_names:
         i.delete(0, END)
     
-def Refill(): #Moves to next page
+def Refill(): #Moves to Refill page.
     global count
     for p in pages:
-        p.pack_forget()
+        p.pack_forget() 
         
     count += 1
     page = pages[count]
@@ -335,13 +335,13 @@ def Refill(): #Moves to next page
     entry_eq_0()
     root.after(5000, Update_Over_Time)
     
-def Update_Over_Time():
+def Update_Over_Time(): # Updates Statuslist, page_1 text and the values in Dispensor_number.
     Read_CSV()
     Update_Numbers()
     Check_If_Refill_Needed()
     print('Updated')
     
-def Start(): #Moves to next page
+def Start(): #is only called at start. Moves to next page and gets values from StatusList.
     global count
     global Dispensor_number
     
@@ -355,13 +355,13 @@ def Start(): #Moves to next page
     page.pack()
     return Dispensor_number
     
-def Start_Update():
+def Start_Update(): #Moves to next page and updates it. 
     Start()
     Update_Numbers()
     Check_If_Refill_Needed()
     page_1.after(10000, Update_Over_Time)
     
-def Move_back_page():
+def Move_back_page(): #Goes back to page_1, and updates the text etc..
     global count
     global Dispensor_number
     for p in pages:
@@ -377,9 +377,9 @@ def Move_back_page():
     
 
 #entry variables
-entry_values=[0,0,0,0,0,0,0,0] 
+entry_values=[0,0,0,0,0,0,0,0]  #stores the entry values.
 
-def get_entry_values():
+def get_entry_values(): #Gets the entry values and stores them in array.
     global entry_values
     global fuse_entry
     entry_values[0]= int(PCB_entry.get())
@@ -391,7 +391,7 @@ def get_entry_values():
     entry_values[6]= int(bot_cov_blue_entry.get())
     entry_values[7]= int(bot_cov_white_entry.get())
 
-def Calculate(indput):
+def Calculate(indput): #calculates the current dispensor number, after refill or removal.
     global entry_values
     global Dispensor_number
     get_entry_values()
@@ -405,21 +405,21 @@ def Calculate(indput):
             Dispensor_number[i]=Dispensor_number[i] - entry_values[i]
         return Dispensor_number
                               
-def Add():
+def Add(): # when Add_btn is pushed the following is happening.
     Calculate(1)
     Move_back_page()
     Clear_Entry()
     Check_If_Refill_Needed()
     root.after(10000, Update_Over_Time)
     
-def Rem():
+def Rem(): # when Rem_btn is pushed the following is happening.
     Calculate(2)
     Move_back_page()
     Clear_Entry()
     Check_If_Refill_Needed()
     root.after(10000, Update_Over_Time)
     
-def Check_If_Refill_Needed():
+def Check_If_Refill_Needed(): #updates the text on page_1, checs if any dispensor needs to be refilled.
     if Dispensor_number[0] < 5:
         PCB_refill.configure(fg='red')
         PCB_refill.pack()
