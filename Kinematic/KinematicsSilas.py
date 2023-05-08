@@ -134,7 +134,7 @@ class KinematicsSilas:
                             [0, 0, 1, 82.3],
                             [0, 0, 0, 1]])
 
-        T06 = (T_base_0.inv)*(pose_Transformation_Matrix)*(T_6_tool.inv)
+        T06 = (T_base_0.inv())*(pose_Transformation_Matrix)*(T_6_tool.inv())
         T_0_6 = sp.Matrix(T06)
 
         a_2 = DH_Params_UR5[3][2]
@@ -149,6 +149,7 @@ class KinematicsSilas:
         theta_1_a = sp.atan2(y_0_6,x_0_6) + sp.acos(d_4/(sp.sqrt(x_0_6**2+y_0_6**2)))-self.pi/2
         theta_1_b = sp.atan2(y_0_6,x_0_6) - sp.acos(d_4/(sp.sqrt(x_0_6**2+y_0_6**2)))-self.pi/2
 
+        print("theta1")
         # theta 5 - four solutions
         theta_5_a = sp.acos(-r_23*sp.cos(theta_1_a)+r_13*sin(theta_1_a)) # theta_1_a
         theta_5_b = -sp.acos(-r_23*sp.cos(theta_1_a)+r_13*sin(theta_1_a)) # theta_1_a
@@ -164,7 +165,7 @@ class KinematicsSilas:
                  [theta_1_b,0,0,0,theta_5_c,0],
                  [theta_1_b,0,0,0,theta_5_d,0],
                  [theta_1_b,0,0,0,theta_5_d,0]]
-
+        print("theta5")
         # theta 6 - four solutions
         for i in range(4):
             r21_T_1_6 = (r_21*sp.cos(angles[i][1]))-(r_11*sp.sin(angles[i][1]))/(sp.sin(angles[i][5]))
@@ -172,14 +173,15 @@ class KinematicsSilas:
             th_6 = sp.atan2(r22_T_1_6,r21_T_1_6)
             angles[2*i-1][5] = th_6
             angles[2*i][5] = th_6
-
+        print("theta6")
+        
         # theta 3
-
         for i in range(4):
             T_0_1 = self.getTransformationMatrix(DH_Params_UR5[0][0],DH_Params_UR5[0][1],DH_Params_UR5[0][2],angles[i][0])
             T_4_5 = self.getTransformationMatrix(DH_Params_UR5[4][0],DH_Params_UR5[4][1],DH_Params_UR5[4][2],angles[i][4])
             T_5_6 = self.getTransformationMatrix(DH_Params_UR5[5][0],DH_Params_UR5[5][1],DH_Params_UR5[5][2],angles[i][5])
-            T14 = (T_0_1.inv)*T_0_6*((T_4_5*T_5_6).inv)
+            T1_4_5_6 = T_4_5*T_5_6
+            T14 = (T_0_1.inv())*T_0_6*(T1_4_5_6.inv())
             T_1_4 = sp.Matrix(T14)
 
             x_1_4 = T_1_4[0,3]
@@ -187,7 +189,7 @@ class KinematicsSilas:
             
             angles[2*i-1][2] = sp.acos((x_1_4**2+z_1_4**2-a_2**2-a_3**2)/(2*a_2*a_3))
             angles[2*i][2] = -sp.acos((x_1_4**2+z_1_4**2-a_2**2-a_3**2)/(2*a_2*a_3))
-
+        print("theta3")
         # theta 2
         for i in range(8):
             T2_0_1 = self.getTransformationMatrix(DH_Params_UR5[0][0],DH_Params_UR5[0][1],DH_Params_UR5[0][2],angles[i][0])
@@ -196,12 +198,12 @@ class KinematicsSilas:
 
             T2_4_5_6 = T2_4_5*T2_5_6
 
-            T214 = (T2_0_1.inv)*T_0_6*(T2_4_5_6.inv)
+            T214 = (T2_0_1.inv())*T_0_6*(T2_4_5_6.inv())
             T2_1_4 = sp.Matrix(T214)
             x2_1_4 = T2_1_4[0,3]
             z2_1_4 = T2_1_4[2,3]
             angles[i][1] = sp.atan2(x2_1_4,z2_1_4) - sp.asin((a_3*sp.sin(angles[i][2]))/sp.sqrt(x2_1_4**2+z2_1_4**2))
-
+        print("theta2")
         # theta 4
         for i in range(8):
             if (angles[i][1]).is_real == True and (angles[i][2]).is_real == True:
@@ -214,9 +216,9 @@ class KinematicsSilas:
                 T3_1_2_3 = T_1*T_2*T_3
                 T3_5_6 = T_5*T_6
 
-                T_3_4_ = (T3_1_2_3.inv)*T_0_6*(T3_5_6.inv)
+                T_3_4_ = (T3_1_2_3.inv())*T_0_6*(T3_5_6.inv())
                 X_y_3_4 = T_3_4_[1,0] 
                 X_x_3_4 = T_3_4_[0,0] 
                 angles[i][3] = sp.atan2(X_y_3_4,X_x_3_4)
-        
+        print("theta4")
         return angles
