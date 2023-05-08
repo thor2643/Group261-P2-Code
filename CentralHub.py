@@ -8,8 +8,12 @@ import os
 #from GUI_OPERATOR import OperatorGUI
 
 last_Line_Number = 0
-data = True
 dispense_Cycle_Time_Sec = 20
+
+#Definition of our alarm and emergency stop parameters. The values are stores in arrays
+component_Alarm_List = [5,41,5,5,5,5,5,5]
+component_EStop_List = [0,0,0,0,0,0,0,0]
+
 
 # - - - - - - - - - All initilization of the communication protocols and functions for connection - - - - - - - - - 
 
@@ -19,7 +23,7 @@ arduino_ser = serial.Serial()
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Bind the socket to a specific IP address and port - thors er '192.168.137.141'
-server_address = ('192.168.0.229',53432)
+server_address = ('192.168.0.177',53432)
 sock.bind(server_address)
 # Listen for incoming connections
 sock.listen(1)
@@ -44,29 +48,26 @@ def Connect_To_Arduino():
             print("No Arduino board found. Please make sure it is connected.")
             time.sleep(5) 
 
-
 #Connects to the arduino and pc
 Connect_To_Arduino()
 
-# - - - - - - - - - All initilization of the .CSV document - - - - - - - - - 
+# - - - - - - - - - All initilization of the .csv document - - - - - - - - - 
 
 line_Number = 0
 start_Num = 3
 
-# Define the file name and column headers
+# Definitions the file names and column headers for the .csv files
 filename = ['OrderList.csv', 'StatusList.csv' ]
 fieldnames = ['data'], ['data_s']
 
+#Let the user choose whether or not they want to delete the current files.
 delete_File_1 = input("Do you want to delete the list of orders? (y/n)").lower() == 'y'
 delete_File_2 = input("Do you want to delete the file containing the current inventory status? (y/n)").lower() == 'y'
 
-
-# Delete the CSV file if it exists, and the delete_File variable is true
-if delete_File_1 and os.path.exists(filename[0]):
-    os.remove(filename[0])
-
-if delete_File_2 and os.path.exists(filename[1]):
-    os.remove(filename[1])
+# Delete the .csv file if it exists, and the delete_File variable is True
+for i in range(2):
+    if os.path.exists(filename[i]) and eval(f"delete_File_{i+1}"):
+        os.remove(filename[i])
 
 # Open the .csv files in 'append' mode and write the header row if the file is empty/none empty
 for i in range(len(filename)):
@@ -101,19 +102,47 @@ def Update_Data_Row_Reached(line,File_Number):
         writer = csv.writer(file)
         writer.writerows(data_Injection)
 
-def Update_Component_Status():
+def Update_Component_Status(Orderlist):
     with open(filename[1], 'r') as csvfile:
         reader = csv.reader(csvfile)
         data_Injection = list(reader)
+        
+        data_Injection[1] = str(int(data_Injection[1]) - 1)
+        data_Injection[2] = str(int(data_Injection[2]) - Orderlist[1] )
 
-    for i in range(7):
-        data_Injection[i + 2] = '0'
-    
+       # First a dictionary is defined, which is used to map Orderlist values to data_Injection indices
+        indices = {0: 3, 1: 4, 2: 5}
+        data_Injection[indices[Orderlist[0]]] = str(int(data_Injection[indices[Orderlist[0]]]) - 1)
+
+        indices = {0: 6, 1: 7, 2: 8}
+        data_Injection[indices[Orderlist[2]]] = str(int(data_Injection[indices[Orderlist[2]]]) - 1)
+
     # Write the updated data back to the CSV file
-    with open(filename[0], 'w', newline='') as file:
+    with open(filename[1], 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerows(data_Injection)
-    
+
+def Check_Component_status():
+    with open(filename[1], 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        component_list = list(reader)   
+
+        #Check if there are any components left, if not then it will stop
+        for i in range(len(component_Alarm_List)):
+            if component_list[i+1] <= component_EStop_List[i]:
+                EStop = True
+                break
+            else:
+                EStop = False
+
+        #Check if there are any components left, if not then it will stop
+        for i in range(len(component_Alarm_List)):
+            if component_list[i+1] < component_Alarm_List[i]:
+                Alarm = True
+                break
+            else:
+                Alarm = False
+    return EStop, Alarm
 
 def read_data_from_csv(File_Number, line_number):
     with open(filename[File_Number], 'r') as csvfile:
@@ -158,8 +187,6 @@ with open(filename[0], "r") as csvfile:
     line_Number = int(row[0]) # There is a conversion error some place. That makes a double digits in the document become a comma separeted value  
   
 Update_Data_Row_Reached(start_Num,0)
-
-
 
 # - - - - - - - - - Function to convert array to "more" useful information. - - - - - - - - -
 
@@ -257,8 +284,19 @@ def Main_controller(line_Number, last_Line_Number):
         Double_Digit = Conversion_Arr_To_DD(phone_assembly)   
             
         for i in range(phone_assembly[3]):
-            Send_To_Arduino(Double_Digit)
-            time.sleep(dispense_Cycle_Time_Sec)
+            Estop, Alarm = Check_Component_status()
+            if Alarm:
+                print('Components needs to be filled up. Please check the operator GUI, or the dispensers')
+
+            if not Estop:
+                #Add something that checks the amount of components.
+                Update_Component_Status(phone_assembly)
+                Send_To_Arduino(Double_Digit)
+                time.sleep(dispense_Cycle_Time_Sec)
+            else:
+                break
+
+            
         
         Update_Data_Row_Reached(line_Number,0)
     else:
