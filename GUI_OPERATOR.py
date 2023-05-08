@@ -27,7 +27,7 @@ root.title("Control GUI")
 main_frame = tk.Frame(root, bg='#F0F0F0')
 main_frame.pack(fill=tk.BOTH, expand=True)
 
-#page 0 setup:
+#page 0 setup(startside):
 page_0 = tk.Frame(main_frame)
 page_0_lb=tk.Label(page_0, text='Operator GUI', font=('Times New Roman',50,'bold'), background= '#F0F0F0')
 page_0_lb.grid(row=0,  column=0, columnspan=4, padx=5,  pady=5)
@@ -67,8 +67,6 @@ PCB=tk.Label(PCB_frame, text='PCB:', font=('Times New Roman',30,'bold'), backgro
 PCB.pack()
 PCB_number=tk.Label(PCB_frame, text= str(Dispensor_number[0]), font=('Times New Roman',25),bg='white')
 PCB_number.pack()
-#PCB_refill=tk.Label(PCB_frame, text='Refill needed!!', font=('Times New Roman',30,'bold'),fg='red', bg= 'white')
-#PCB_refill.pack()
 
 #Fuse frame setup:
 fill_fuse=tk.Label(Fuse_frame, text=" ",bg= 'white')
@@ -77,8 +75,6 @@ Fuse=tk.Label(Fuse_frame, text='Fuses:', font=('Times New Roman',30,'bold'), bac
 Fuse.pack()
 Fuse_number=tk.Label(Fuse_frame, text= str(Dispensor_number[1]), font=('Times New Roman',25),bg='white')
 Fuse_number.pack()
-#Fuse_refill=tk.Label(Fuse_frame, text='Refill needed!!', font=('Times New Roman',30,'bold'),fg='red', bg= 'white')
-#Fuse_refill.pack()
 
 #TOP Cover frame setup:
 fill_top_cov=tk.Label(top_cov_frame, text=" ",bg= 'white')
@@ -103,7 +99,7 @@ fill_top_cov_3=tk.Label(top_cov_frame, text=" ",bg= 'white')
 fill_top_cov_3.pack()
 
 
-#BOT Cover:
+#BOT Cover setup:
 fill_bot_cov=tk.Label(bot_cov_frame, text=" ",bg= 'white')
 fill_bot_cov.pack()
 fill_bot_cov_1=tk.Label(bot_cov_frame, text=" ",bg= 'white')
@@ -124,11 +120,9 @@ bot_cov_number=tk.Label(bot_cov_frame,
 bot_cov_number.pack()
 fill_bot_cov_3=tk.Label(bot_cov_frame, text=" ",bg= 'white')
 fill_bot_cov_3.pack()
-#bot_cov_refill=tk.Label(bot_cov_frame, text='Refill needed!!', font=('Times New Roman',30,'bold'),fg='red', bg= 'white')
-#bot_cov_refill.pack()
 
 
-#page 2:
+#page 2 Setup:
 page_2 = tk.Frame(main_frame)
 page_2_lb=tk.Label(page_2, text='Refill', font=('Times New Roman',30,'bold'), bg='#F0F0F0')
 page_2_lb.grid(row=0,  column=0, columnspan=4, padx=5,  pady=5)
@@ -138,7 +132,7 @@ message_Alert3=tk.Label(page_2, text=' and push the corresponding button:', font
 message_Alert3.place(x=390,y=150)
 
 
-#frames page 2:
+#frames page 2 (setup):
 PCB_frame2  =  Frame(page_2,  width=300,  height= 200,  bg='white', highlightbackground="black", highlightthickness=2)
 PCB_frame2.grid(row=1, rowspan=2,  column=0, sticky='w',  padx=10,  pady=10)
 PCB_frame2.pack_propagate(False)
@@ -155,21 +149,21 @@ bot_cov_frame2  =  Frame(page_2,  width=525,  height=350,  bg='white', highlight
 bot_cov_frame2.grid(row=3,  column=2, columnspan=2, sticky='e',  padx=10,  pady=10)
 bot_cov_frame2.pack_propagate(False)
 
-#PCB:
+#PCB Setup for page_2:
 fill_PCB=tk.Label(PCB_frame2, text=" ",bg= 'white')
 fill_PCB.pack()
 PCB=tk.Label(PCB_frame2, text='PCB:', font=('Times New Roman',30,'bold'), background= 'white')
 PCB.pack()
 
 
-#Fuses:
+#Fuse Setup for page_2:
 fill_fuse=tk.Label(Fuse_frame2, text=" ",bg= 'white')
 fill_fuse.pack()
 Fuse=tk.Label(Fuse_frame2, text='Fuses:', font=('Times New Roman',30,'bold'), background= 'white')
 Fuse.pack()
 
 
-#TOP Cover:
+#TOP Cover Setup for page_2:
 fill_top_cov=tk.Label(top_cov_frame2, text=" ",bg= 'white')
 fill_top_cov.pack()
 fill_top_cov_1=tk.Label(top_cov_frame2, text=" ",bg= 'white')
@@ -185,7 +179,7 @@ top_cov_col=tk.Label(top_cov_frame2,
 top_cov_col.pack()
 
 
-#BOT Cover:
+#BOT Cover Setup for page_2:
 fill_bot_cov=tk.Label(bot_cov_frame2, text=" ",bg= 'white')
 fill_bot_cov.pack()
 fill_bot_cov_1=tk.Label(bot_cov_frame2, text=" ",bg= 'white')
@@ -200,7 +194,7 @@ bot_cov_col=tk.Label(bot_cov_frame2,
                      background= 'white')
 bot_cov_col.pack()
 
-#Refill needed text:
+#"Refill needed" text setup:
 PCB_refill=tk.Label(PCB_frame, text='Refill needed!!', font=('Times New Roman',30,'bold'),fg='red', bg= 'white')
 PCB_refill.pack()
 
@@ -213,11 +207,11 @@ top_cov_refill.pack()
 bot_cov_refill=tk.Label(bot_cov_frame, text='Refill needed!!', font=('Times New Roman',30,'bold'),fg='red', bg= 'white')
 bot_cov_refill.pack()
 
-#funktion for removal of entry input:
+#function for removal of entry input:
 def remove_0(indput):
     indput.delete(0,'0')
 
-#Entry is beeing defined:
+#Entrys is beeing defined:
 PCB_entry = tk.Entry(page_2, width=10,highlightthickness=2, highlightbackground="black", exportselection=1)
 PCB_entry.place(x=115,y=170)
 PCB_entry.bind('<FocusIn>', remove_0(PCB_entry))
@@ -253,15 +247,13 @@ bot_cov_white_entry.bind('<FocusIn>', remove_0(bot_cov_white_entry))
 #array with entry names:
 entry_names=[PCB_entry,fuse_entry,top_cov_black_entry,top_cov_blue_entry,top_cov_white_entry,bot_cov_black_entry,bot_cov_blue_entry,bot_cov_white_entry]
 
-
 #array for pages:
-pages = [page_0, page_1, page_2]
+pages = [page_0, page_1, page_2] #makes it possible to change page.
 page = pages[count]
 page.pack()
 
-#funktions:  
-def Read_CSV():
-    #Function to read
+#All the funktions:  
+def Read_CSV():  #Reads the Statuslist and sets Dispensor_number to its value: 
     with open(filename, 'r') as csvfile:
         component_List=[0,0,0,0,0,0,0,0]
         reader = csv.reader(csvfile)
@@ -274,7 +266,7 @@ def Read_CSV():
             component_List[i] = int(str(data_csv[i + 1]).strip('[]').replace("'",""))
     return component_List
             
-def Write_Csv(component_List):
+def Write_Csv(component_List): #Updates statusliste. Sets Statuslists to our changed Dispensor_number array.
     data_Injection=[0,0,0,0,0,0,0,0]
     #Function to read and write
     with open(filename, 'r') as csvfile:
@@ -293,7 +285,7 @@ def Write_Csv(component_List):
         writer.writerows(data_Injection)
 
 
-def entry_eq_0():
+def entry_eq_0(): #All entrys gets set to 0, to avoid fail, when reading entrys later.
     PCB_entry.insert(0,'0')
     PCB_entry.bind('<FocusIn>', remove_0(PCB_entry))
 
@@ -318,7 +310,7 @@ def entry_eq_0():
     bot_cov_white_entry.insert(0,'0')
     bot_cov_white_entry.bind('<FocusIn>', remove_0(bot_cov_white_entry))
 
-def Update_Numbers():
+def Update_Numbers(): #Updates the numbers according to Dispensor_number on page_1.
     PCB_number.configure(text= str(Dispensor_number[0]))
     PCB_number.pack()
     Fuse_number.configure(text= str(Dispensor_number[1]))
