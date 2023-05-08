@@ -14,7 +14,6 @@ dispense_Cycle_Time_Sec = 20
 component_Alarm_List = [5,41,5,5,5,5,5,5]
 component_EStop_List = [0,0,0,0,0,0,0,0]
 
-
 # - - - - - - - - - All initilization of the communication protocols and functions for connection - - - - - - - - - 
 
 # Set up the serial connections
@@ -23,7 +22,7 @@ arduino_ser = serial.Serial()
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Bind the socket to a specific IP address and port - thors er '192.168.137.141'
-server_address = ('192.168.0.177',53432)
+server_address = ('192.168.137.141',53432)
 sock.bind(server_address)
 # Listen for incoming connections
 sock.listen(1)
@@ -107,15 +106,15 @@ def Update_Component_Status(Orderlist):
         reader = csv.reader(csvfile)
         data_Injection = list(reader)
         
-        data_Injection[1] = str(int(data_Injection[1]) - 1)
-        data_Injection[2] = str(int(data_Injection[2]) - Orderlist[1] )
+        data_Injection[1] = str(int(str(data_Injection[1]).strip('[]').replace("'","")) - 1)
+        data_Injection[2] = str(int(str(data_Injection[2]).strip('[]').replace("'","")) - Orderlist[1] )
 
        # First a dictionary is defined, which is used to map Orderlist values to data_Injection indices
         indices = {0: 3, 1: 4, 2: 5}
-        data_Injection[indices[Orderlist[0]]] = str(int(data_Injection[indices[Orderlist[0]]]) - 1)
+        data_Injection[indices[Orderlist[0]]] = str(int(str(data_Injection[indices[Orderlist[0]]]).strip('[]').replace("'","")) - 1)
 
         indices = {0: 6, 1: 7, 2: 8}
-        data_Injection[indices[Orderlist[2]]] = str(int(data_Injection[indices[Orderlist[2]]]) - 1)
+        data_Injection[indices[Orderlist[2]]] = str(int(str(data_Injection[indices[Orderlist[2]]]).strip('[]').replace("'","")) - 1)
 
     # Write the updated data back to the CSV file
     with open(filename[1], 'w', newline='') as file:
@@ -127,9 +126,10 @@ def Check_Component_status():
         reader = csv.reader(csvfile)
         component_list = list(reader)   
 
+
         #Check if there are any components left, if not then it will stop
         for i in range(len(component_Alarm_List)):
-            if component_list[i+1] <= component_EStop_List[i]:
+            if int(str(component_list[i+1]).strip('[]').replace("'","")) <= component_EStop_List[i]:
                 EStop = True
                 break
             else:
@@ -137,7 +137,7 @@ def Check_Component_status():
 
         #Check if there are any components left, if not then it will stop
         for i in range(len(component_Alarm_List)):
-            if component_list[i+1] < component_Alarm_List[i]:
+            if int(str(component_list[i+1]).strip('[]').replace("'","")) < component_Alarm_List[i]:
                 Alarm = True
                 break
             else:
@@ -286,19 +286,16 @@ def Main_controller(line_Number, last_Line_Number):
         for i in range(phone_assembly[3]):
             Estop, Alarm = Check_Component_status()
             if Alarm:
-                print('Components needs to be filled up. Please check the operator GUI, or the dispensers')
+                print('Components needs to be filled up. To find out which please check the operator GUI, or the dispensers')
 
             if not Estop:
                 #Add something that checks the amount of components.
                 Update_Component_Status(phone_assembly)
                 Send_To_Arduino(Double_Digit)
                 time.sleep(dispense_Cycle_Time_Sec)
+                Update_Data_Row_Reached(line_Number,0)
             else:
-                break
-
-            
-        
-        Update_Data_Row_Reached(line_Number,0)
+                break     
     else:
         #print('No new number')
         pass
