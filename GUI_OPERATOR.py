@@ -21,6 +21,14 @@ root.title("Control GUI")
 main_frame = tk.Frame(root, bg='#F0F0F0')
 main_frame.pack(fill=tk.BOTH, expand=True)
 
+#page 0 setup:
+page_0 = tk.Frame(main_frame)
+page_0_lb=tk.Label(page_0, text='Operator GUI', font=('Times New Roman',50,'bold'), background= '#F0F0F0')
+page_0_lb.grid(row=0,  column=0, columnspan=4, padx=5,  pady=5)
+message_Alert=tk.Label(page_0, text='Press button to start:', font=('Times New Roman',20,'bold'),bg='#F0F0F0')
+message_Alert.grid(row=1,  column=0, columnspan=4, padx=20,  pady=20)
+
+
 #page 1 setup:
 page_1 = tk.Frame(main_frame)
 page_1_lb=tk.Label(page_1, text='Control Center', font=('Times New Roman',50,'bold'), background= '#F0F0F0')
@@ -240,36 +248,37 @@ entry_names=[PCB_entry,fuse_entry,top_cov_black_entry,top_cov_blue_entry,top_cov
 
 
 #array for pages:
-pages = [page_1, page_2]
+pages = [page_0, page_1, page_2]
 page = pages[count]
 page.pack()
 
 #funktions:  
-def Read_CSV(component_List):
+def Read_CSV():
     #Function to read
     with open(filename, 'r') as csvfile:
+        component_List=[0,0,0,0,0,0,0,0]
         reader = csv.reader(csvfile)
         data_csv = list(reader)
-        
-        for i in range(7):
-            component_List[i] = int(str(data_csv[i + 2]).strip('[]').replace("'",""))
+
+        for i in range(8):
+            component_List[i] = int(str(data_csv[i + 1]).strip('[]').replace("'",""))
     return component_List
             
 def Write_Csv(component_List):
+    data_Injection=[0,0,0,0,0,0,0,0]
     #Function to read and write
     with open(filename, 'r') as csvfile:
         reader = csv.reader(csvfile)
         data_Injection = list(reader)
         
         for i in range(8):
-            data_Injection[i + 2] = str(int(component_List[i]))
+            data_Injection[i + 1] = str(int(component_List[i]))
+
     
-    with open(filename[0], 'w', newline='') as file:
+    with open(filename, 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerows(data_Injection)
 
-def Send_Change_in_Disp():
-    print(Dispensor_number)
 
 def entry_eq_0():
     PCB_entry.insert(0,'0')
@@ -320,8 +329,29 @@ def Refill(): #Moves to next page
     page.pack()
     entry_eq_0()
     
+    
+def Start(): #Moves to next page
+    global count
+    global Dispensor_number
+    
+    Dispensor_number=Read_CSV()
+    
+    for p in pages:
+        p.pack_forget()
+        
+    count += 1
+    page = pages[count]
+    page.pack()
+    return Dispensor_number
+    
+def Start_Update():
+    Start()
+    Update_Numbers()
+    Check_If_Refill_Needed()
+    
 def Move_back_page():
     global count
+    global Dispensor_number
     for p in pages:
             p.pack_forget()
 
@@ -329,7 +359,15 @@ def Move_back_page():
     page = pages[count]
     page.pack()
     Update_Numbers()
+    print('før write')
+    print(Dispensor_number)
     Write_Csv(Dispensor_number)
+    print('efter Write')
+    print(Dispensor_number)
+    Dispensor_number=Read_CSV()
+    print('efter read:')
+    print(Dispensor_number)
+    return Dispensor_number
     
 #entry variables
 entry_values=[0,0,0,0,0,0,0,0] 
@@ -365,7 +403,6 @@ def Add():
     Move_back_page()
     Clear_Entry()
     Check_If_Refill_Needed()
-    Send_Change_in_Disp()
     
 def Rem():
     Calculate(2)
@@ -411,6 +448,17 @@ refill_btn=tk.Button(page_1,text='Refill now',
                      )
 refill_btn.grid(row=2,  column=0, columnspan=4,  padx=5,  pady=5)
 
+start_btn=tk.Button(page_0,text='Start',
+                     font=('Times New Roman', 40, 'bold'),
+                     bg='grey',
+                     fg='black',
+                     width=8,
+                     height=2,
+                     relief=GROOVE,
+                     command=Start_Update
+                     )
+start_btn.grid(row=2,  column=0, columnspan=4,  padx=5,  pady=5)
+
 #buttons page chance:
 add_btn = tk.Button(page_2,text='Add', 
                      font=('Bold', 20),
@@ -430,12 +478,6 @@ remove_btn = tk.Button(page_2, text='Remove',
                      )
 remove_btn.place(x=555,y=200)
 
-#Kode som skal køres til start
-with open(filename, 'a', newline='') as csvfile:
-    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-    Update_Numbers()
-    print('start')
-Read_CSV(Dispensor_number)
-Update_Numbers()
+
 
 root.mainloop()
