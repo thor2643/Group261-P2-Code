@@ -117,6 +117,20 @@ def Page_buttons():
 #funktions
 def move_next_page():
     global count
+    if count==5:
+        for p in pages:
+            p.pack_forget()
+        count = -1
+        page = pages[count+1]
+        page.pack(pady=100)
+        Page_buttons()
+        phone[3]=' '
+        amount_label.configure(text='Amount of phones: '+ str(phone[3]))
+        amount_label.place(x=645,y=25)
+        chosen_amount.configure(text='Amount of phones: ' + str(phone[3]))
+        amount.delete(0, END)
+        chosen_amount.place()
+        
         
     if count ==4: 
         print(phone)
