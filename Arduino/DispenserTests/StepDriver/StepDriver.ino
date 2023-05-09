@@ -4,7 +4,7 @@
 //Negative is in, and positive is out
 // Define the number of steps per revolution for the 28BYJ-48 stepper motor
 const int steps_Per_Revolution = 2038;
-const int steps_per_Dispense = -69 * 100;
+const int steps_per_Dispense = -70 * 100;
 const int step_Speed = 15;
 
 int combination_List[] = {0,4,5,6,10,14,15,16,20,24,25,26,30,34,35,36};
@@ -63,6 +63,7 @@ void loop() {
 
     if (Is_Valid_Input(temp_Num)) {
       Stepper_Drive(digits[1], digits[0]);
+      Serial.println("Process complete!");
     }
     else {
       Serial.println("Invalid input");

@@ -6,8 +6,12 @@ import socket
 import csv
 import os
 
+
 last_Line_Number = 0
-data_write = False
+
+#Definition of our alarm and emergency stop parameters. The values are stores in arrays
+component_Alarm_List = [5,41,5,5,5,5,5,5]
+component_EStop_List = [0,0,0,0,0,0,0,0]
 
 # - - - - - - - - - All initilization of the communication protocols and functions for connection - - - - - - - - - 
 
@@ -16,8 +20,8 @@ arduino_ser = serial.Serial()
 
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# Bind the socket to a specific IP address and port
-server_address = ('172.27.30.88',53432)
+# Bind the socket to a specific IP address and port - thors er '192.168.137.141'
+server_address = ('192.168.137.141',53432)
 sock.bind(server_address)
 # Listen for incoming connections
 sock.listen(1)
@@ -42,102 +46,172 @@ def Connect_To_Arduino():
             print("No Arduino board found. Please make sure it is connected.")
             time.sleep(5) 
 
+def Receive_data_Arduino():
+    data = arduino_ser.readline().decode().strip()
+    if data == "Process complete!":
+        return True
+    else:
+        return False
 
 #Connects to the arduino and pc
 Connect_To_Arduino()
 
-# - - - - - - - - - All initilization of the .CSV document - - - - - - - - - 
+# - - - - - - - - - All initilization of the .csv document - - - - - - - - - 
 
 line_Number = 0
-start_Num = '3'
+start_Num = 3
 
-# Define the file name and column headers
-filename = 'OrderList.csv'
-fieldnames = ['data']
+# Definitions the file names and column headers for the .csv files
+filename = ['OrderList.csv', 'StatusList.csv' ]
+fieldnames = ['data'], ['data_s']
 
-delete_File = input("Do you want to delete the CSV file? (y/n)").lower() == 'y'
+#Let the user choose whether or not they want to delete the current files.
+delete_File_1 = input("Do you want to delete the list of orders? (y/n)").lower() == 'y'
+delete_File_2 = input("Do you want to delete the file containing the current inventory status? (y/n)").lower() == 'y'
 
-# Delete the CSV file if it exists, and the delete_File variable is true
-if delete_File and os.path.exists(filename):
-    os.remove(filename)
+# Delete the .csv file if it exists, and the delete_File variable is True
+for i in range(2):
+    if os.path.exists(filename[i]) and eval(f"delete_File_{i+1}"):
+        os.remove(filename[i])
 
-# Open the CSV file in 'append' mode and write the header row if the file is empty/none empty
-with open(filename, 'a', newline='') as csvfile:
-    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-    if os.path.exists(filename) and os.stat(filename).st_size > 0:
-        # file exists and is not empty, do nothing
-        pass
-    else:
-        # file does not exist or is empty, write header
-        writer.writeheader()
-        writer.writerow({'data':1})
+# Open the .csv files in 'append' mode and write the header row if the file is empty/none empty
+for i in range(len(filename)):
+    with open(filename[i], 'a', newline='') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames[i])
+        
+        if os.path.exists(filename[i]) and os.stat(filename[i]).st_size > 0:
+            # file exists and is not empty, do nothing
+            pass
+        else:
+            # file does not exist or is empty, write header
+            writer.writeheader()
+            if i == 0:
+                writer.writerow({'data': 0})
+            else:
+                writer.writerow({'data_s': 0})
+                for i in range(7):
+                    writer.writerow({'data_s': 0 })
 
-def Update_Data_Row_Reached(line):
-    with open(filename, 'r') as csvfile:
+            csvfile.seek(0)
+    
+def Update_Data_Row_Reached(line,File_Number):
+    with open(filename[File_Number], 'r') as csvfile:
         reader = csv.reader(csvfile)
         data_Injection = list(reader)
    
-    # Replace the second row with new data
-    data_Injection[1] = line
+    # Replace the second row with new data. The data has to be a string. A comma seems to arrive when str() is used. Therefore this method is used.
+    data_Injection[1] = str(line)
 
     # Write the updated data back to the CSV file
-    with open(filename, 'w', newline='') as file:
+    with open(filename[0], 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerows(data_Injection)
 
-def read_data_from_csv(filename, line_number):
-    global data_write
-    if (data_write):
-        time.sleep(1)
-    
-    data_write = True
-    with open(filename, 'r') as csvfile:
+def Update_Component_Status(Orderlist):
+    with open(filename[1], 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        data_Injection = list(reader)
+        
+        for i in range(len(data_Injection)):
+            data_Injection[i] = str(data_Injection[i]).strip('[]').replace(",", "").replace("'", "").replace(" ", "")
+        print(data_Injection)
+
+        data_Injection[1] = str(int(data_Injection[1]) - 1)
+        data_Injection[2] = str(int(data_Injection[2])- Orderlist[1] )
+
+       # First a dictionary is defined, which is used to map Orderlist values to data_Injection indices
+        indices = {0: 3, 1: 4, 2: 5}
+        data_Injection[indices[Orderlist[0]]] = str(int(data_Injection[indices[Orderlist[0]]]) - 1)
+
+        indices = {0: 6, 1: 7, 2: 8}
+        data_Injection[indices[Orderlist[2]]] = str(int(data_Injection[indices[Orderlist[2]]]) - 1)
+
+    # Write the updated data back to the CSV file
+    with open(filename[1], 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerows(data_Injection)
+
+def Check_Component_status():
+    with open(filename[1], 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        component_list = list(reader)   
+
+
+        #Check if there are any components left, if not then it will stop
+        for i in range(len(component_Alarm_List)):
+            if int(str(component_list[i+1]).strip('[]').replace("'","").replace(", ","")) <= component_EStop_List[i]:
+                EStop = True
+                break
+            else:
+                EStop = False
+
+        #Check if there are any components left, if not then it will stop
+        for i in range(len(component_Alarm_List)):
+            if int(str(component_list[i+1]).strip('[]').replace("'","").replace(", ","")) < component_Alarm_List[i]:
+                Alarm = True
+                break
+            else:
+                Alarm = False
+    return EStop, Alarm
+
+def read_data_from_csv(File_Number, line_number):
+    with open(filename[File_Number], 'r') as csvfile:
         reader = csv.reader(csvfile)
         # Skip the header row
         next(reader)
         # Skip all rows until we reach the desired row number
         for i in range(line_number - 2):
             next(reader)
-        # Return the data from the desired row
-        row = next(reader)
-
-        txt = row[0]
-        x = [int(num) for num in txt.split(', ')]
-
-        # Check if current row is the last row in the file
-        is_last_row = True
+        
+        # Check if there are more rows in the file
         try:
-            next(reader)
+            row = next(reader)
             is_last_row = False
         except StopIteration:
             is_last_row = True
-            pass
+            row = []
+       
+        #An error occured, where an array where only ['3'] would be present would be passed. If this occours, it is set to empty. The rest of the code, can handle that gracefully.
+        if row == ['3']:
+            row = ''
 
-    data_write = False
+        txt = row[0] if row else ''
+        x = []
+        if txt.strip():
+            x = [int(num) for num in txt.split(', ')]
 
-    if not is_last_row:
-        line_number += 1
+        # Adjust the line_number if there are more rows in the file
+        line_number += 1 if not is_last_row else 0
 
-    line_Number = line_number
-
-    return x, line_Number
+    return x, line_number
 
 
+#The next line of code will setup the documents, so that they are in a state ready to get the formated information.
 #Find out what line number which the program reached last time it was run. In the document "data" is the header, and on line 2 the value of the last reached data line is found.
-#The default value is 3, as the first two lines are occoupied.
-with open(filename, "r") as csvfile:
+#The default value is 3, as the first two lines are occupied.
+
+with open(filename[0], 'r') as csvfile:
+    reader = csv.reader(csvfile)
+    data_Injection = list(reader)
+
+    print(data_Injection[1])
+
+    if data_Injection[1] == ['0']:
+        Update_Data_Row_Reached(start_Num,0)
+
+with open(filename[0], "r") as csvfile:
     reader = csv.reader(csvfile)
     # Skip the header row
     next(reader)
     row = next(reader)
-    line_Number = int(row[0])
+    line_Number = int(row[0]) 
+  
 
-Update_Data_Row_Reached(start_Num)
 
 # - - - - - - - - - Function to convert array to "more" useful information. - - - - - - - - -
 
 def Conversion_Arr_To_DD(array):
-    #The array phone_assembly consist of 4 entries. The first (0) and the third (2) entries describe the corvers. 
+    #The array phone_assembly consist of 4 entries. The first (0) and the third (2) entries describe the covers. 
     # If the value is 0 then it is black. If the value is 1 then it is white, and lastly the cover it blue if the value is 2 
     # We firstly handle the topcover
 
@@ -180,8 +254,7 @@ def Conversion_Arr_To_DD(array):
 
     except (TypeError, IndexError):
         print('Invalid input values. The input array must contain 4 integers.') 
-
-    
+  
 # - - - - - - - - - Function to append and receive data. From both the arduino, but also the PC - - - - - - - - -
 
 # Function to send data to the Arduino
@@ -207,34 +280,48 @@ def Receive_From_Pc():
                 data = connection.recv(16)
                 print('Received:', data.decode())
                 if data:
-                    if data_write:
-                        time.sleep(1)
 
-                    data_write = True
                     # Save the received data to the CSV file
-                    with open(filename, 'a', newline='') as csvfile:
-                        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                    with open(filename[0], 'a', newline='') as csvfile:
+                        writer = csv.DictWriter(csvfile, fieldnames=fieldnames[0])
                         writer.writerow({'data': data.decode()})
                     connection.sendall(data)
-                    data_write = False
+
                 else:
                     break
         finally:
             # Clean up the connection
             connection.close()
 
-def Main_controller(line_Number, last_Line_Number):
-    phone_assembly, line_Number = read_data_from_csv(filename, line_Number)
-    if line_Number > last_Line_Number:
-        last_Line_Number = line_Number
-        Double_Digit = Conversion_Arr_To_DD(phone_assembly)   
+# - - - - - - - - - Main controller function and instantiation of the OperatorGUI - - - - - - - - -
 
+def Main_controller(line_Number, last_Line_Number):
+    last_Line_Number = line_Number
+    
+    phone_assembly, line_Number = read_data_from_csv(0, line_Number)
+    
+    if line_Number > last_Line_Number and phone_assembly:
+        Double_Digit = Conversion_Arr_To_DD(phone_assembly)   
+            
         for i in range(phone_assembly[3]):
-            Send_To_Arduino(Double_Digit)
-            time.sleep(2)   
+            Estop, Alarm = Check_Component_status()
+            if Alarm:
+                print('Components needs to be filled up. To find out which please check the operator GUI, or the dispensers')
+
+            if not Estop:
+                #Add something that checks the amount of components.
+                Update_Component_Status(phone_assembly)
+                Send_To_Arduino(Double_Digit)
+                while not Receive_data_Arduino():
+                    pass
+                Update_Data_Row_Reached(line_Number,0)
+            else:
+                print('A stop has been engaged, as there are not enough components to build a phone')
+                break     
     else:
         #print('No new number')
         pass
+
     return line_Number, last_Line_Number
 
 
@@ -245,11 +332,12 @@ pc_thread = threading.Thread(target=Receive_From_Pc)
 
 # Start thread
 pc_thread.start()
+#GUI_Operator_thread.start()
 
 # - - - - - - - - - Main Code - - - - - - - - -
 while True:
     #print('Main controller received this line number:' + str(line_Number))
     line_Number, last_Line_Number = Main_controller(line_Number, last_Line_Number)
 
-#close the thread
+#close the thread - This part of the code cannot be reached. This is on purpose, as we at all times want to have the server opened if the program is running. 
 pc_thread.join()

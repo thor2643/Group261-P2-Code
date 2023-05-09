@@ -1,7 +1,7 @@
 import tkinter as tk
-from tkinter import Tk
 from tkinter import *
 from PIL import ImageTk, Image
+import socket
 
 # root window
 root = tk.Tk()
@@ -13,11 +13,12 @@ root.title('Design your phone')
 root.resizable(0, 0)
 phone = [0,0,0,1]  #(0=black, 1=blue, 2=white), 0-2 fuses, color, amount
 count=0  #page
-color= ['Black','Black', 'Black']
+color= ['Black','Blue', 'White']
 
 
 main_frame = tk.Frame(root, bg='light blue')
 
+#Funktion:
 def color_chosen():
     global color
     n = range(3)
@@ -31,14 +32,15 @@ def color_chosen():
     return color
 
 #Each page is defined
-page_1 = tk.Frame(main_frame)
-page_1_lb=tk.Label(page_1, text='Build your phone', font=('Times New Roman',30,'bold'), bg='light blue')
+page_1 = tk.Frame(main_frame, bg='light blue')
+page_1_lb=tk.Label(page_1, text='Build your phone', font=('Times New Roman',30,'bold'), fg='Black', bg='light blue')
+page_1_lb.pack()
+page_1.pack()
+
 #image part:
 img=Image.open('phone_assemp.png')
 resize_img= img.resize((300,300))
 page_1_img = ImageTk.PhotoImage(resize_img)
-page_1_lb.pack()
-page_1.pack()
 label_img = tk.Label(page_1, image = page_1_img, fg='light blue', bg='light blue')
 label_img.pack()
 
@@ -46,11 +48,9 @@ page_2 = tk.Frame(main_frame)
 page_2_lb=tk.Label(page_2, text='Bottom cover color', font=('Times New Roman',30,'bold'), bg='light blue')
 page_2_lb.pack()
 
-
 page_3 = tk.Frame(main_frame)
 page_3_lb=tk.Label(page_3, text='Number of fuses', font=('Times New Roman',30,'bold'), bg='light blue')
 page_3_lb.pack()
-
 
 page_4 = tk.Frame(main_frame)
 page_4_lb=tk.Label(page_4, text='Top cover color', font=('Times New Roman',30,'bold'), bg='light blue')
@@ -76,13 +76,11 @@ page.pack(pady=100)
 
 main_frame.pack(fill=tk.BOTH, expand=True)
  
-#funktions
+# Button funktions
 def hide_button(widget):
     # This will remove the widget from toplevel
     widget.pack_forget()
-  
-  
-# Method to make Button(widget) visible
+
 def show_button(widget):
     widget.pack_forget()
     # This will recover the widget from toplevel
@@ -95,19 +93,19 @@ def show_button(widget):
     
 def Page_buttons():
     if count == 1 or count == 3:
-        show_button(black_btn)
-        show_button(blue_btn)
-        show_button(white_btn)
         hide_button(fuse_0)
         hide_button(fuse_1)
         hide_button(fuse_2)
+        show_button(black_btn)
+        show_button(blue_btn)
+        show_button(white_btn)
     if count == 2:
-        show_button(fuse_0)
-        show_button(fuse_1)
-        show_button(fuse_2)
         hide_button(black_btn)
         hide_button(blue_btn)
         hide_button(white_btn)
+        show_button(fuse_0)
+        show_button(fuse_1)
+        show_button(fuse_2)
     if count == 0 or count == 4:
         hide_button(black_btn)
         hide_button(blue_btn)
@@ -119,6 +117,25 @@ def Page_buttons():
 #funktions
 def move_next_page():
     global count
+    if count==5:
+        for p in pages:
+            p.pack_forget()
+        count = -1
+        page = pages[count+1]
+        page.pack(pady=100)
+        Page_buttons()
+        phone[3]=' '
+        amount_label.configure(text='Amount of phones: '+ str(phone[3]))
+        amount_label.place(x=645,y=25)
+        chosen_amount.configure(text='Amount of phones: ' + str(phone[3]))
+        amount.delete(0, END)
+        chosen_amount.place()
+        
+        
+    if count ==4: 
+        print(phone)
+        print('---------------sendt----------------------')
+        Get_Data()
         
     color_chosen()
     #chosen_amount.configure(text='Amount of phones: ' + str(amount_chosen))
@@ -144,9 +161,7 @@ def move_next_page():
         page.pack(pady=100)
         Page_buttons()
         return count
-        
-
-
+    
 def move_back_page():
     global count
     
@@ -195,7 +210,7 @@ def set_fuse2():
 def Amount():
     try: 
         int(amount.get())
-        phone[3]=amount.get()
+        phone[3]=int(amount.get())
         amount_label.configure(text='Amount of phones: '+ str(phone[3]))
         amount_label.place(x=645,y=25)
         chosen_amount.configure(text='Amount of phones: ' + str(phone[3]))
@@ -204,8 +219,37 @@ def Amount():
     except ValueError:
         amount_label.configure(text='Amount of phones: '+ str(phone[3]))
         amount_label.place(x=645,y=25)
-        
 
+#Funktion for COMUNIKATION:    
+def Get_Data():
+    # Create a TCP/IP socket
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    # Connect the socket to the server's IP address and port
+    server_address = ('192.168.137.141',53432)
+    sock.connect(server_address)
+
+    try:
+        # Send data
+        message_not_bytes =', '.join(str(x) for x in phone)
+        print(message_not_bytes)
+        message = bytes(message_not_bytes, 'utf-8')
+        print(message)
+        sock.sendall(message)
+        print('Sent:', message.decode())
+
+        # Look for the response
+        amount_received = 0
+        amount_expected = len(message)
+
+        while amount_received < amount_expected:
+            data = sock.recv(16)
+            amount_received += len(data)
+            print('Received:', data.decode())
+
+    finally:
+        # Clean up the connection
+        sock.close()
 
 #frames:
 bottom_frame = tk.Frame(root)
@@ -216,7 +260,7 @@ amount = tk.Entry(root)
 amount_label.place(x=645,y=25)
 amount.place(x=650,y=50)
 
-amount_btn=tk.Button(root,text= 'Chose amount',
+amount_btn=tk.Button(root,text= 'Choose amount',
                      font=('Bold',8),
                      bg='white',
                      relief=GROOVE,
@@ -247,21 +291,17 @@ black_btn = tk.Button(root,text='Black',
                     command=set_black,
                     relief=GROOVE)
 
-
 blue_btn = tk.Button(root,text='Blue', 
                     font=('Bold', 20),
                     bg='blue', fg='white', width=8,
                     command=set_blue,
                     relief=GROOVE)
 
-
 white_btn = tk.Button(root, text='White', 
                     font=('Bold', 20),
                     bg='white', fg='black', width=8,
                     command=set_white,
                     relief=GROOVE)
-
-
 
 #bottoms for fuses:
 
