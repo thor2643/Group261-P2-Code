@@ -5,10 +5,9 @@ import threading
 import socket
 import csv
 import os
-#from GUI_OPERATOR import OperatorGUI
+
 
 last_Line_Number = 0
-dispense_Cycle_Time_Sec = 20
 
 #Definition of our alarm and emergency stop parameters. The values are stores in arrays
 component_Alarm_List = [5,41,5,5,5,5,5,5]
@@ -46,6 +45,13 @@ def Connect_To_Arduino():
         else:
             print("No Arduino board found. Please make sure it is connected.")
             time.sleep(5) 
+
+def Receive_data_Arduino():
+    data = arduino_ser.readline().decode().strip()
+    if data == "Process complete!":
+        return True
+    else:
+        return False
 
 #Connects to the arduino and pc
 Connect_To_Arduino()
@@ -94,7 +100,7 @@ def Update_Data_Row_Reached(line,File_Number):
         data_Injection = list(reader)
    
     # Replace the second row with new data. The data has to be a string. A comma seems to arrive when str() is used. Therefore this method is used.
-    data_Injection[1] = str(line).replace(',', '')
+    data_Injection[1] = str(line)
 
     # Write the updated data back to the CSV file
     with open(filename[0], 'w', newline='') as file:
@@ -106,15 +112,19 @@ def Update_Component_Status(Orderlist):
         reader = csv.reader(csvfile)
         data_Injection = list(reader)
         
-        data_Injection[1] = str(int(str(data_Injection[1]).strip('[]').replace("'","")) - 1)
-        data_Injection[2] = str(int(str(data_Injection[2]).strip('[]').replace("'","")) - Orderlist[1] )
+        for i in range(len(data_Injection)):
+            data_Injection[i] = str(data_Injection[i]).strip('[]').replace(",", "").replace("'", "").replace(" ", "")
+        print(data_Injection)
+
+        data_Injection[1] = str(int(data_Injection[1]) - 1)
+        data_Injection[2] = str(int(data_Injection[2])- Orderlist[1] )
 
        # First a dictionary is defined, which is used to map Orderlist values to data_Injection indices
         indices = {0: 3, 1: 4, 2: 5}
-        data_Injection[indices[Orderlist[0]]] = str(int(str(data_Injection[indices[Orderlist[0]]]).strip('[]').replace("'","")) - 1)
+        data_Injection[indices[Orderlist[0]]] = str(int(data_Injection[indices[Orderlist[0]]]) - 1)
 
         indices = {0: 6, 1: 7, 2: 8}
-        data_Injection[indices[Orderlist[2]]] = str(int(str(data_Injection[indices[Orderlist[2]]]).strip('[]').replace("'","")) - 1)
+        data_Injection[indices[Orderlist[2]]] = str(int(data_Injection[indices[Orderlist[2]]]) - 1)
 
     # Write the updated data back to the CSV file
     with open(filename[1], 'w', newline='') as file:
@@ -129,7 +139,7 @@ def Check_Component_status():
 
         #Check if there are any components left, if not then it will stop
         for i in range(len(component_Alarm_List)):
-            if int(str(component_list[i+1]).strip('[]').replace("'","")) <= component_EStop_List[i]:
+            if int(str(component_list[i+1]).strip('[]').replace("'","").replace(", ","")) <= component_EStop_List[i]:
                 EStop = True
                 break
             else:
@@ -137,7 +147,7 @@ def Check_Component_status():
 
         #Check if there are any components left, if not then it will stop
         for i in range(len(component_Alarm_List)):
-            if int(str(component_list[i+1]).strip('[]').replace("'","")) < component_Alarm_List[i]:
+            if int(str(component_list[i+1]).strip('[]').replace("'","").replace(", ","")) < component_Alarm_List[i]:
                 Alarm = True
                 break
             else:
@@ -179,19 +189,29 @@ def read_data_from_csv(File_Number, line_number):
 #The next line of code will setup the documents, so that they are in a state ready to get the formated information.
 #Find out what line number which the program reached last time it was run. In the document "data" is the header, and on line 2 the value of the last reached data line is found.
 #The default value is 3, as the first two lines are occupied.
+
+with open(filename[0], 'r') as csvfile:
+    reader = csv.reader(csvfile)
+    data_Injection = list(reader)
+
+    print(data_Injection[1])
+
+    if data_Injection[1] == ['0']:
+        Update_Data_Row_Reached(start_Num,0)
+
 with open(filename[0], "r") as csvfile:
     reader = csv.reader(csvfile)
     # Skip the header row
     next(reader)
     row = next(reader)
-    line_Number = int(row[0]) # There is a conversion error some place. That makes a double digits in the document become a comma separeted value  
+    line_Number = int(row[0]) 
   
-Update_Data_Row_Reached(start_Num,0)
+
 
 # - - - - - - - - - Function to convert array to "more" useful information. - - - - - - - - -
 
 def Conversion_Arr_To_DD(array):
-    #The array phone_assembly consist of 4 entries. The first (0) and the third (2) entries describe the corvers. 
+    #The array phone_assembly consist of 4 entries. The first (0) and the third (2) entries describe the covers. 
     # If the value is 0 then it is black. If the value is 1 then it is white, and lastly the cover it blue if the value is 2 
     # We firstly handle the topcover
 
@@ -292,21 +312,22 @@ def Main_controller(line_Number, last_Line_Number):
                 #Add something that checks the amount of components.
                 Update_Component_Status(phone_assembly)
                 Send_To_Arduino(Double_Digit)
-                time.sleep(dispense_Cycle_Time_Sec)
+                while not Receive_data_Arduino():
+                    pass
                 Update_Data_Row_Reached(line_Number,0)
             else:
+                print('A stop has been engaged, as there are not enough components to build a phone')
                 break     
     else:
         #print('No new number')
         pass
+
     return line_Number, last_Line_Number
 
-#GUIOperator = OperatorGUI()
 
 # - - - - - - - - - Threading - - - - - - - - -
 
 # Create a thread for receiving data from the PC
-#GUI_Operator_thread = threading.Thread(target=GUIOperator.Run_Operator_GUI)
 pc_thread = threading.Thread(target=Receive_From_Pc)
 
 # Start thread
@@ -320,4 +341,3 @@ while True:
 
 #close the thread - This part of the code cannot be reached. This is on purpose, as we at all times want to have the server opened if the program is running. 
 pc_thread.join()
-#GUI_Operator_thread.join()

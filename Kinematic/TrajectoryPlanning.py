@@ -113,8 +113,10 @@ class TrajectoryPlanner:
             if vals[0] == "linear":                                 #vals = [func, avg_vel]
                 info.append([vals[1], 0, 0, vals[0], 0, 0])
             elif vals[0] == "cb" or vals[0] == "default":           #vals = [func, tf, v0, vf]
-                info.append([0, 0, vals[1], vals[0], vals[2], vals[3]])
-            
+                if len(vals) == 4:
+                    info.append([0, 0, vals[1], vals[0], vals[2], vals[3]])
+                elif
+    
         print(info)
         for idx in range(len(points)-1):
             func, _, tf = self.get2PointMoveLFunction(  points[idx], 
