@@ -410,14 +410,12 @@ def Add(): # when Add_btn is pushed the following is happening.
     Move_back_page()
     Clear_Entry()
     Check_If_Refill_Needed()
-    root.after(10000, Update_Over_Time)
     
 def Rem(): # when Rem_btn is pushed the following is happening.
     Calculate(2)
     Move_back_page()
     Clear_Entry()
     Check_If_Refill_Needed()
-    root.after(10000, Update_Over_Time)
     
 def Check_If_Refill_Needed(): #updates the text on page_1, checs if any dispensor needs to be refilled.
     if Dispensor_number[0] < 5:
