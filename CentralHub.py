@@ -19,7 +19,7 @@ arduino_ser = serial.Serial()
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Bind the socket to a specific IP address and port - To make this code work, on AAU's wifi a group members pc
 # is used as a router. Ip used: '192.168.137.141'
-server_address = ('192.168.137.71',53432)
+server_address = ('192.168.137.73',53432)
 sock.bind(server_address)
 # Listen for incoming connections
 sock.listen(1)
