@@ -347,9 +347,12 @@ def Main_controller(line_Number, last_Line_Number):
                 # A double digit is send to the arduino, so it can start the dispensing sequence
                 Send_To_Arduino(Double_Digit)
 
+
                 #The program is keept inside the loop until the arduino sends back a message telling it has completed the process. 
                 while not Receive_data_Arduino():
                     pass
+
+                
                 #Lastly the line number inside the csv document Orderlist is updated so the next phone in the list will be produced when called next time.
                 Update_Data_Row_Reached(line_Number,0)
             else:
