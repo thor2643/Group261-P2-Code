@@ -5,6 +5,9 @@ import threading
 import socket
 import csv
 import os
+from robodk import robolink    # RoboDK API
+#from robodk import robomath    # Robot toolbox
+
 
 #Definition of our alarm and emergency stop parameters. The values are stored in arrays
 component_Alarm_List = [5,41,5,5,5,5,5,5]
@@ -15,11 +18,14 @@ component_EStop_List = [0,0,0,0,0,0,0,0]
 # Set up the serial connections
 arduino_ser = serial.Serial()
 
+# Establish a connection with RoboDK
+RDK = robolink.Robolink()
+
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Bind the socket to a specific IP address and port - To make this code work, on AAU's wifi a group members pc
 # is used as a router. Ip used: '192.168.137.141'
-server_address = ('192.168.137.141',53432)
+server_address = ('192.168.137.205',53432)
 sock.bind(server_address)
 # Listen for incoming connections
 sock.listen(1)
@@ -52,11 +58,16 @@ def Connect_To_Arduino():
 # To the dispenser trough the serial port until, the dispensing mechanism is ready to dispense again. 
 def Receive_data_Arduino():
     # This function reads from the serial port, and only return true if the arduino outputs Proces complete!
-    data = arduino_ser.readline().decode().strip()
-    if data == "Process complete!":
-        return True
-    else:
-        return False
+    Keep_going = False
+    while not Keep_going:
+        data = arduino_ser.readline().decode().strip()
+        print(data)
+        if data == "Finished":
+            Keep_going = True
+        else:
+            Keep_going = False
+
+    
 
 # Here we establish a connection to the arduino
 Connect_To_Arduino()
@@ -347,11 +358,10 @@ def Main_controller(line_Number, last_Line_Number):
                 # A double digit is send to the arduino, so it can start the dispensing sequence
                 Send_To_Arduino(Double_Digit)
 
-
                 #The program is keept inside the loop until the arduino sends back a message telling it has completed the process. 
-                while not Receive_data_Arduino():
-                    pass
-
+                Receive_data_Arduino()
+                # Make the robot run the correct program of assembly. There are three programs, which are dependent on the amount of fuses that needs to be in the phone. 
+                RDK.RunProgram(f"{phone_assembly[1]} Fuses", True)
                 
                 #Lastly the line number inside the csv document Orderlist is updated so the next phone in the list will be produced when called next time.
                 Update_Data_Row_Reached(line_Number,0)

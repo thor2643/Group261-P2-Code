@@ -69,10 +69,10 @@ void loop() {
     if (Is_Valid_Input(temp_Num)) {
       Stepper_Drive(digits[1], digits[0]);
       // A print is made, which will be send trough the serial port, to let the python program know it can continue the operation
-      Serial.println("Process complete!");
+      Serial.write("Finished\n");
     }
     else {
-      Serial.println("Invalid input");
+      //Serial.println("Invalid input");
     }
   }
 }
@@ -80,8 +80,8 @@ void loop() {
 // This function will use the split up double digit to drive the dispensing sequence by the requested stepper motors 
 void Stepper_Drive(int motor_Num1, int motor_Num2){
   
-  Serial.print(motor_Num1);
-  Serial.print(motor_Num2);
+  // Serial.print(motor_Num1);
+  // Serial.print(motor_Num2);
 
   // First it is checked if both motor values are larger than 0. If they are, it means they both need to drive at the same time
   if (motor_Num1 > 0 && motor_Num2 > 0){
