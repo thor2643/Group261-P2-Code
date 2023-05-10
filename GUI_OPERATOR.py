@@ -333,13 +333,8 @@ def Refill(): #Moves to Refill page.
     page = pages[count]
     page.pack()
     entry_eq_0()
-    root.after(5000, Update_Over_Time)
+    root.after(5000, Update)
     
-def Update_Over_Time(): # Updates Statuslist, page_1 text and the values in Dispensor_number.
-    Read_CSV()
-    Update_Numbers()
-    Check_If_Refill_Needed()
-    print('Updated')
     
 def Start(): #is only called at start. Moves to next page and gets values from StatusList.
     global count
@@ -362,15 +357,20 @@ def Start_Update(): #Moves to next page and updates it.
     Update()
     
 def Update():
-    if page==page_1:
-        Read_CSV()
+    global Dispensor_number
+    if count==1:
+        print(Dispensor_number)
+        Dispensor_number=Read_CSV()
+        print(Dispensor_number)
         Update_Numbers()
         Check_If_Refill_Needed()
         print('Updated')
-        page_1.after(10000, Update)
+        root.after(10000, Update)
+        return Dispensor_number
     else:
         print('still runs')
         root.after(10000,Update)
+        return Dispensor_number
         
         
     
