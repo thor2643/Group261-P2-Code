@@ -359,7 +359,20 @@ def Start_Update(): #Moves to next page and updates it.
     Start()
     Update_Numbers()
     Check_If_Refill_Needed()
-    page_1.after(10000, Update_Over_Time)
+    Update()
+    
+def Update():
+    if page==page_1:
+        Read_CSV()
+        Update_Numbers()
+        Check_If_Refill_Needed()
+        print('Updated')
+        page_1.after(10000, Update)
+    else:
+        print('still runs')
+        root.after(10000,Update)
+        
+        
     
 def Move_back_page(): #Goes back to page_1, and updates the text etc..
     global count
