@@ -4,7 +4,7 @@
 // Negative is in, and positive is out in regards to the dispenser
 // constants that define the number of steps per revolution for the 28BYJ-48 stepper motor, the speed and how many steps there is per dispense
 const int steps_Per_Revolution = 2038;
-const int steps_per_Dispense = -70 * 100;
+const int steps_per_Dispense = -7150;
 const int step_Speed = 15;
 
 // A list with the double digits that are allowed, and the size of the list
