@@ -4,8 +4,8 @@
 // Negative is in, and positive is out in regards to the dispenser
 // constants that define the number of steps per revolution for the 28BYJ-48 stepper motor, the speed and how many steps there is per dispense
 const int steps_Per_Revolution = 2038;
-const int steps_per_Dispense = -7150;
-const int step_Speed = 15;
+const int steps_per_Dispense = -7300;
+const int step_Speed = 20;
 
 // A list with the double digits that are allowed, and the size of the list
 int combination_List[] = {0,4,5,6,10,14,15,16,20,24,25,26,30,34,35,36};
@@ -68,8 +68,6 @@ void loop() {
     // then the digits will be passed on in the stepper function
     if (Is_Valid_Input(temp_Num)) {
       Stepper_Drive(digits[1], digits[0]);
-      // A print is made, which will be send trough the serial port, to let the python program know it can continue the operation
-      Serial.write("Finished\n");
     }
     else {
       //Serial.println("Invalid input");
@@ -95,6 +93,8 @@ void Stepper_Drive(int motor_Num1, int motor_Num2){
       stepperMotors[motor_Num2 - 1].step(-1);
       delay(1);  
     }
+    // A print is made, which will be send trough the serial port, to let the python program know it can continue the operation
+      Serial.write("Finished\n");
     //Then a for-loop is used to move them back to the starting position, so they can dispense again.
     for (int i = 0; i < (-steps_per_Dispense); i++) {
       stepperMotors[motor_Num1 - 1].step(1);
@@ -105,12 +105,16 @@ void Stepper_Drive(int motor_Num1, int motor_Num2){
   else if (motor_Num1 > 0) {
     stepperMotors[motor_Num1 - 1].setSpeed(step_Speed);
     stepperMotors[motor_Num1 - 1].step(steps_per_Dispense);
+    // A print is made, which will be send trough the serial port, to let the python program know it can continue the operation
+      Serial.write("Finished\n");
     delay(10); 
     stepperMotors[motor_Num1 - 1].step(-steps_per_Dispense);
   } // The same happens here, but with the other motor.
   else {
     stepperMotors[motor_Num2 - 1].setSpeed(step_Speed);
     stepperMotors[motor_Num2 - 1].step(steps_per_Dispense);
+    // A print is made, which will be send trough the serial port, to let the python program know it can continue the operation
+      Serial.write("Finished\n");
     delay(10); 
     stepperMotors[motor_Num2 - 1].step(-steps_per_Dispense);
   }
