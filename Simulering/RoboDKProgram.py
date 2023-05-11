@@ -96,21 +96,44 @@ class RoboDKProgram:
 
             target = self.RDK.AddTarget(f"{name} target", self.ref_frame)
             joints = self.robot.SolveIK_All(dispenser_target)
+            target.setAsJointTarget()
+            print(configuration)
 
+            target_set = False
             #We want to choose the same config for all targets e.g. having the arm above the table
             for joint in joints:
-                config_type = self.robot.JointsConfig(joint)
-                conf = list(config_type)
+                #config_type = self.robot.JointsConfig(joint)
+                #conf = list(config_type)
                 
-                if conf == configuration:
-                    if (joint[5] < prev_val and name != names_in_order[0]) or (joint[5] > 0):
+                count = 0
+                for i in range(6):
+                    if configuration[i][0] <= joint[i] <= configuration[i][1] and joint[5] < prev_val:
+                        count += 1
+                        print(count)
+                        pass
+                    else:
+                        break
+
+                    if count == 6:
                         target.setJoints(joint)
                         prev_val = joint[5]
-                        break
-            
-            target.setAsJointTarget()
+                        target_set = True
+                        
+                if target_set:
+                    break
 
-    def initialise_program(self, name):
+
+
+
+                #if conf == configuration:
+                    #if (joint[5] < prev_val and name != names_in_order[0]) or (joint[5] > 0):
+                        #target.setJoints(joint)
+                        #prev_val = joint[5]
+                        #break
+            
+            
+
+    def initialise_program(self, name, speed = 50):
         """Creates an empty program and configures it to use correct reference frames"""
 
         #Create the robodk program
@@ -119,7 +142,7 @@ class RoboDKProgram:
         #Set relevant frames
         self.program.setPoseFrame(self.ref_frame)
         self.program.setPoseTool(self.robot.PoseTool())
-        self.program.setSpeed(200, 100)   #linear vel and joint vel
+        self.program.setSpeed(100, speed)   #linear vel and joint vel
         self.program.setRounding(10)
 
     def get_target_pose(self, name):
