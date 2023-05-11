@@ -5,7 +5,7 @@ import threading
 import socket
 import csv
 import os
-from robodk import robolink    # RoboDK API
+#from robodk import robolink    # RoboDK API
 #from robodk import robomath    # Robot toolbox
 
 
@@ -25,11 +25,7 @@ RDK = robolink.Robolink()
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Bind the socket to a specific IP address and port - To make this code work, on AAU's wifi a group members pc
 # is used as a router. Ip used: '192.168.137.141'
-<<<<<<< HEAD
-server_address = ('192.168.137.205',53432)
-=======
 server_address = ('192.168.137.73',53432)
->>>>>>> 26b8ebd3e47af0603d9b34f6b473d523821328c9
 sock.bind(server_address)
 # Listen for incoming connections
 sock.listen(1)
@@ -365,7 +361,7 @@ def Main_controller(line_Number, last_Line_Number):
                 #The program is keept inside the loop until the arduino sends back a message telling it has completed the process. 
                 Receive_data_Arduino()
                 # Make the robot run the correct program of assembly. There are three programs, which are dependent on the amount of fuses that needs to be in the phone. 
-                RDK.RunProgram(f"{phone_assembly[1]} Fuses", True)
+                #RDK.RunProgram(f"{phone_assembly[1]} Fuses", True)
                 
                 #Lastly the line number inside the csv document Orderlist is updated so the next phone in the list will be produced when called next time.
                 Update_Data_Row_Reached(line_Number,0)
