@@ -25,7 +25,7 @@ RDK = robolink.Robolink()
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Bind the socket to a specific IP address and port - To make this code work, on AAU's wifi a group members pc
 # is used as a router. Ip used: '192.168.137.141' Thors 192.168.137.236
-server_address = ('172.27.21.54',53432)
+server_address = ('192.168.137.245',53432)
 sock.bind(server_address)
 # Listen for incoming connections
 sock.listen(1)
@@ -367,7 +367,7 @@ def Main_controller(line_Number, last_Line_Number):
                 #The program is keept inside the loop until the arduino sends back a message telling it has completed the process. 
                 Receive_data_Arduino()
                 # Make the robot run the correct program of assembly. There are three programs, which are dependent on the amount of fuses that needs to be in the phone. 
-                #RDK.RunProgram(f"{phone_assembly[1]} Fuses", True)
+                RDK.RunProgram(f"{phone_assembly[1]} Fuses", True)
                 
                 #Lastly the line number inside the csv document Orderlist is updated so the next phone in the list will be produced when called next time.
                 Update_Data_Row_Reached(line_Number,0)
@@ -391,8 +391,8 @@ pc_thread = threading.Thread(target=Receive_From_Pc)
 pc_thread.start()
 
 # - - - - - - - - - Main loop - - - - - - - - -
-while True:
-    line_Number, last_Line_Number = Main_controller(line_Number, last_Line_Number)
+#while True:
+    #line_Number, last_Line_Number = Main_controller(line_Number, last_Line_Number)
 
 #close the thread - This part of the code cannot be reached. This is on purpose, as we at all times want to have the server opened if the program is running. 
-pc_thread.join()
+#pc_thread.join()
