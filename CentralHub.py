@@ -21,15 +21,11 @@ arduino_ser = serial.Serial()
 # Establish a connection with RoboDK
 RDK = robolink.Robolink()
 
-# Create a TCP/IP socket
+# Create a TCP/IP socketn
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Bind the socket to a specific IP address and port - To make this code work, on AAU's wifi a group members pc
-# is used as a router. Ip used: '192.168.137.141'
-<<<<<<< HEAD
-server_address = ('192.168.137.205',53432)
-=======
-server_address = ('192.168.137.73',53432)
->>>>>>> 26b8ebd3e47af0603d9b34f6b473d523821328c9
+# is used as a router. Ip used: '192.168.137.141' Thors 192.168.137.236
+server_address = ('172.27.21.54',53432)
 sock.bind(server_address)
 # Listen for incoming connections
 sock.listen(1)
