@@ -5,7 +5,7 @@ import threading
 import socket
 import csv
 import os
-#from robodk import robolink    # RoboDK API
+from robodk import robolink    # RoboDK API
 #from robodk import robomath    # Robot toolbox
 
 
@@ -334,8 +334,14 @@ def Main_controller(line_Number, last_Line_Number):
     
     # Then the read_data_from_csv funtion is called to can an order, being the array phone_assembly and the value for the line_number.
     # The same line number will be returned, if there is no new available data, and all the orders has been produced.
-    phone_assembly, line_Number = read_data_from_csv(0, line_Number)
-    
+    read = 1
+    while read:
+        try:
+            phone_assembly, line_Number = read_data_from_csv(0, line_Number)
+            read = 0
+        except:
+            print("Could not open document. Permission denied")
+        
     # It is checked if it is a new order, meaning the line number is larger than the last line number and if phone_assebly is non-empty
     if line_Number > last_Line_Number and phone_assembly:
         # Based on the order, phone_assembly, a double digit is produced which will be send to the Arduino
