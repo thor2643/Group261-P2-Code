@@ -117,6 +117,7 @@ def Page_buttons():
 #funktions
 def move_next_page():
     global count
+    next_btn.configure(text='Next')
     if count==5:
         for p in pages:
             p.pack_forget()
@@ -135,7 +136,7 @@ def move_next_page():
     if count ==4: 
         print(phone)
         print('---------------sendt----------------------')
-        Get_Data()
+        #Get_Data()
         
     color_chosen()
     #chosen_amount.configure(text='Amount of phones: ' + str(amount_chosen))
@@ -168,6 +169,7 @@ def move_back_page():
     if count== 4:
         next_btn.configure(text='Next')
         back_btn.pack(side=tk.LEFT)
+        
 
     if not count ==  0:
 
@@ -179,6 +181,10 @@ def move_back_page():
         page.pack(pady=100)
         Page_buttons()
         return count
+    
+    if count==3:
+        next_btn.configure(text='Done')
+        back_btn.pack(side=tk.LEFT)
         
 def set_black():
     global count
