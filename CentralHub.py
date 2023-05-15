@@ -5,7 +5,7 @@ import threading
 import socket
 import csv
 import os
-#from robodk import robolink    # RoboDK API
+from robodk import robolink    # RoboDK API
 #from robodk import robomath    # Robot toolbox
 
 
@@ -21,11 +21,11 @@ arduino_ser = serial.Serial()
 # Establish a connection with RoboDK
 RDK = robolink.Robolink()
 
-# Create a TCP/IP socket
+# Create a TCP/IP socketn
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Bind the socket to a specific IP address and port - To make this code work, on AAU's wifi a group members pc
-# is used as a router. Ip used: '192.168.137.141'
-server_address = ('192.168.137.73',53432)
+# is used as a router. Ip used: '192.168.137.141' Thors 192.168.137.236
+server_address = ('172.27.31.206',53432)
 sock.bind(server_address)
 # Listen for incoming connections
 sock.listen(1)
@@ -334,8 +334,14 @@ def Main_controller(line_Number, last_Line_Number):
     
     # Then the read_data_from_csv funtion is called to can an order, being the array phone_assembly and the value for the line_number.
     # The same line number will be returned, if there is no new available data, and all the orders has been produced.
-    phone_assembly, line_Number = read_data_from_csv(0, line_Number)
-    
+    read = 1
+    while read:
+        try:
+            phone_assembly, line_Number = read_data_from_csv(0, line_Number)
+            read = 0
+        except:
+            print("Could not open document. Permission denied")
+        
     # It is checked if it is a new order, meaning the line number is larger than the last line number and if phone_assebly is non-empty
     if line_Number > last_Line_Number and phone_assembly:
         # Based on the order, phone_assembly, a double digit is produced which will be send to the Arduino
@@ -361,7 +367,7 @@ def Main_controller(line_Number, last_Line_Number):
                 #The program is keept inside the loop until the arduino sends back a message telling it has completed the process. 
                 Receive_data_Arduino()
                 # Make the robot run the correct program of assembly. There are three programs, which are dependent on the amount of fuses that needs to be in the phone. 
-                #RDK.RunProgram(f"{phone_assembly[1]} Fuses", True)
+                RDK.RunProgram(f"{phone_assembly[1]} Fuses", True)
                 
                 #Lastly the line number inside the csv document Orderlist is updated so the next phone in the list will be produced when called next time.
                 Update_Data_Row_Reached(line_Number,0)

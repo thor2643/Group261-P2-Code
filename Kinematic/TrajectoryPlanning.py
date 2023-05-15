@@ -30,30 +30,29 @@ class TrajectoryPlanner:
             if functionType.lower() == "pb" or functionType.lower() == "default":
                 #Check if acceleration value is valid or set acceleration
                 if acc != 0:
-                    assert np.all((acc > abs((4*(pose2-pose1)/tf**2)))), f"Acceleration must be higher than {np.max(abs(4*(pose2-pose1)/tf**2))}"
+                    assert np.all((acc > abs((4*(pose2-pose1)/pow(tf,2))))), f"Acceleration must be higher than {np.max(abs(4*(pose2-pose1)/pow(tf,2)))}"
                 else:
-                    acc = np.max(abs(4*(pose2-pose1)/tf**2))
+                    acc = np.max(abs(4*(pose2-pose1)/pow(tf,2)))
 
 
                 #Calculate necessary velocity to stay within the time limit (if possible) and 
-                # thereafter use parbolic blend 
-                tb = (tf/2)-(np.sqrt(acc**2*tf**2-4*acc*(abs(pose2-pose1)))/(2*acc))
+                # thereafter use parabolic blend 
+                tb = (tf/2)-(np.sqrt(pow(acc,2)*pow(tf,2)-4*acc*(abs(pose2-pose1)))/(2*acc))
 
                 #Make sure tb is a numpy array to comply with the for-loop in "moveL"
                 tb =  tb if isinstance(tb, np.ndarray) else np.array([tb])
                 acc = [(acc if 0 <= (pose2[i]-pose1[i]) else -acc) for i in range(tb.size)]
-                #print(acc)
-                pos_b = pose1+(1/2)*tb**2*acc 
+                pos_b = pose1+(1/2)*pow(tb,2)*acc 
 
                 def moveL(t):
                     vec_out = []
                     for i in range(tb.size):   
                         if t<=abs(tb[i]):
-                            vec_out.append(pose1[i]+(1/2)*acc[i]*t**2)
+                            vec_out.append(pose1[i]+(1/2)*acc[i]*pow(t,2))
                         elif t>abs(tb[i]) and t<(tf-abs(tb[i])):
                             vec_out.append(pos_b[i]+acc[i]*tb[i]*(t-tb[i]))
                         elif t>=(tf-abs(tb[i])) and t<=tf:
-                            vec_out.append(pose2[i]-(1/2)*acc[i]*(tf-t)**2)
+                            vec_out.append(pose2[i]-(1/2)*acc[i]*pow((tf-t),2))
                         else:
                             print("You entered a number outside the scope of this function")
                         
@@ -115,7 +114,7 @@ class TrajectoryPlanner:
             elif vals[0] == "cb" or vals[0] == "default":           #vals = [func, tf, v0, vf]
                 if len(vals) == 4:
                     info.append([0, 0, vals[1], vals[0], vals[2], vals[3]])
-                elif
+                #elif
     
         print(info)
         for idx in range(len(points)-1):
@@ -179,6 +178,22 @@ class TrajectoryPlanner:
         ax.legend()
 
         plt.show()
+
+    def getJointPath(self, pose1, pose2, num_points = 50):
+        """Creates a path in joint space without regarding velocity and acceleration"""
+        pose1 =  pose1 if isinstance(pose1, np.ndarray) else (np.array(pose1) if isinstance(pose1, list) else np.array([pose1]))
+        pose2 =  pose2 if isinstance(pose2, np.ndarray) else (np.array(pose2) if isinstance(pose2, list) else np.array([pose2]))
+
+        diff = pose2-pose1
+        increment = diff/num_points
+        target_poses = []
+
+        for i in range(num_points+1):
+            target = pose1 + i*increment
+            target_poses.append(target)
+
+        return target_poses 
+
 
 
 

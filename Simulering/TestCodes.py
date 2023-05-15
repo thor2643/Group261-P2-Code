@@ -30,27 +30,27 @@ names = [name_path[0] for name_path in names_paths]
 simulation.load_dispensers_from_roboDK(names)
 
 #Set offset matrices from dispener origin to TCP and correct orientation
-name_matrices = [[names[0], robomath.transl(-31,-66,222.5) * robomath.rotx(-robomath.pi/2) * robomath.rotx(22*robomath.pi/180) *robomath.rotz(2*robomath.pi)],
-                 [names[1], robomath.transl(-98.95, -18.3, 197.2)*robomath.rotx(-robomath.pi/2) * robomath.rotx(22*robomath.pi/180) * robomath.rotz(3/2*robomath.pi)],
+name_matrices = [[names[0], robomath.transl(-31,-66,220.5) * robomath.rotx(-robomath.pi/2) * robomath.rotx(22*robomath.pi/180) *robomath.rotz(2*robomath.pi)],
+                 [names[1], robomath.transl(-99.65, -29.166, 224.1)*robomath.rotx(-robomath.pi/2) * robomath.rotx(22*robomath.pi/180) * robomath.rotz(3/2*robomath.pi)],
                  [names[2], robomath.transl(-20.6, -42.5, 210.7)*robomath.rotx(-robomath.pi/2) * robomath.rotx(22*robomath.pi/180) * robomath.rotz(robomath.pi)],
                  [names[3], robomath.transl(-31,-66,222.5)*robomath.rotx(-robomath.pi/2) * robomath.rotx(22*robomath.pi/180) * robomath.rotz(robomath.pi/2)]]
 
 simulation.set_T_dispenser_TCP_offset(names_and_matrices=name_matrices)
 
 #Change the dispenser positions to form a circular movement
-gripper_fuse_radius = 100 #mm
-gripper_rest_radius = 117 #mm
+#gripper_fuse_radius = 100 #mm
+gripper_rest_radius = 129 #mm
 
-radius = 550 #mm
-d_fuse_angle = (((robomath.pi/2)*gripper_fuse_radius)/radius) * 180/robomath.pi
+radius = 450 #mm
+d_fuse_angle = (((robomath.pi/2)*gripper_rest_radius)/radius) * 180/robomath.pi
 #d_rest_angle = (((robomath.pi/2)*gripper_rest_radius)/radius) * 180/robomath.pi
 
-start_angle = -25
+start_angle = -38
 
 names_angles = [[names[0], start_angle],
                 [names[1], start_angle + d_fuse_angle],
-                [names[2], start_angle + 2*d_fuse_angle],
-                [names[3], start_angle + 3*d_fuse_angle]]
+                [names[2], start_angle + 2*d_fuse_angle-1],
+                [names[3], start_angle + 3*d_fuse_angle-1]]
 
 simulation.set_in_circular_position(names_angles, radius=radius)
 
