@@ -5,6 +5,16 @@ import math
 
 UR5 = tp.TrajectoryPlanner()
 
+
+joints1 = np.array([42.98, -89.59, 125.57, -58.89, 74.26, 189.54])
+joints2 = np.array([68.78, -89.74, 125.44, -58.6, 74.26, 96.54])
+
+points = UR5.getJointPath(joints1, joints2)
+
+for point in points:
+    print(point)
+
+
 #Parabolic blend from angle to angle
 l1, t0, tf = UR5.get2PointMoveLFunction(15, 75, 0, 3, 10)
 #UR5.plot2DTrajectory(l1, t0, tf)
