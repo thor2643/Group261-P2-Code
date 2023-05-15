@@ -437,7 +437,7 @@ def Check_If_Refill_Needed(): #updates the text on page_1, checs if any dispenso
     else:
         PCB_refill.configure(fg='white')
     
-    if Dispensor_number[1] < 41:
+    if Dispensor_number[1] < 47:
         Fuse_refill.configure(fg='red')
         Fuse_refill.pack()
     else:
