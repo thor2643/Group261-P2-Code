@@ -136,7 +136,7 @@ def move_next_page():
     if count ==4: 
         print(phone)
         print('---------------sendt----------------------')
-        #Get_Data()
+        Get_Data()
         
     color_chosen()
     #chosen_amount.configure(text='Amount of phones: ' + str(amount_chosen))
