@@ -4,15 +4,15 @@ from robodk import robomath
 
 def activate_gripper(name):
     match name.lower():
-        case "fuse":
+        case "pcb":
             simulation.set_IO(0, 1)
             simulation.set_IO(1, 0)
         case "top":
-            simulation.set_IO(0, 1)
-            simulation.set_IO(1, 0)
+            simulation.set_IO(0, 0)
+            simulation.set_IO(1, 1)
         case "bottom":
             simulation.set_IO(0, 1)
-            simulation.set_IO(1, 0)
+            simulation.set_IO(1, 1)
         
     
 names_paths = [["TopDispenser", 'C:/Users/Thor9/OneDrive - Aalborg Universitet/Dokumenter/AAU\Projektarbejde/_P2 Projekt/Tegninger/Dispenser/Cover/CoverDispenserAssembled.step'],
@@ -30,24 +30,34 @@ names = [name_path[0] for name_path in names_paths]
 simulation.load_dispensers_from_roboDK(names)
 
 #Set offset matrices from dispener origin to TCP and correct orientation
-name_matrices = [[names[0], robomath.transl(-31,-66,222.5) * robomath.rotx(-robomath.pi/2) * robomath.rotx(22*robomath.pi/180) *robomath.rotz(2*robomath.pi)],
-                 [names[1], robomath.transl(-98.95, -18.3, 197.2)*robomath.rotx(-robomath.pi/2) * robomath.rotx(22*robomath.pi/180) * robomath.rotz(3/2*robomath.pi)],
+name_matrices = [[names[0], robomath.transl(-31,-66,220.5) * robomath.rotx(-robomath.pi/2) * robomath.rotx(22*robomath.pi/180) *robomath.rotz(2*robomath.pi)],
+                 [names[1], robomath.transl(-99.65, -29.166, 224.1)*robomath.rotx(-robomath.pi/2) * robomath.rotx(22*robomath.pi/180) * robomath.rotz(3/2*robomath.pi)],
                  [names[2], robomath.transl(-20.6, -42.5, 210.7)*robomath.rotx(-robomath.pi/2) * robomath.rotx(22*robomath.pi/180) * robomath.rotz(robomath.pi)],
                  [names[3], robomath.transl(-31,-66,222.5)*robomath.rotx(-robomath.pi/2) * robomath.rotx(22*robomath.pi/180) * robomath.rotz(robomath.pi/2)]]
 
 simulation.set_T_dispenser_TCP_offset(names_and_matrices=name_matrices)
 
 #Change the dispenser positions to form a circular movement
-radius = 550 #mm
-names_angles = [[names[0], -35],
-                [names[1], -10],
-                [names[2], 10],
-                [names[3], 35]]
+#gripper_fuse_radius = 100 #mm
+gripper_rest_radius = 129 #mm
+
+radius = 450 #mm
+d_fuse_angle = (((robomath.pi/2)*gripper_rest_radius)/radius) * 180/robomath.pi
+#d_rest_angle = (((robomath.pi/2)*gripper_rest_radius)/radius) * 180/robomath.pi
+
+start_angle = -38
+
+names_angles = [[names[0], start_angle],
+                [names[1], start_angle + d_fuse_angle],
+                [names[2], start_angle + 2*d_fuse_angle-1],
+                [names[3], start_angle + 3*d_fuse_angle-1]]
 
 simulation.set_in_circular_position(names_angles, radius=radius)
 
 #Uncomment to create target points
-simulation.create_dispenser_targetpoints(names)
+#List over joint intervals
+joint_configurations = [[0, 180], [-105, -45], [80, 150], [-100, -25], [35, 105], [-150, 360]]
+simulation.create_dispenser_targetpoints(names, joint_configurations)
 
 prog_name = "Main program"
 simulation.initialise_program(prog_name)
@@ -99,6 +109,21 @@ assembly_targets.append(simulation.add_target(top_assembly_approach, "TopAssembl
 
 
 simulation.add_moveJ(assembly_targets[0])
+simulation.add_moveJ(assembly_targets[1])
+activate_gripper("bottom")
+simulation.add_moveJ(assembly_targets[2])
+simulation.add_moveJ(assembly_targets[3])
+simulation.add_moveJ(assembly_targets[4])
+activate_gripper("pcb")
+simulation.add_moveJ(assembly_targets[5])
+simulation.add_moveJ(assembly_targets[6])
+simulation.add_moveJ(assembly_targets[7])
+simulation.add_moveJ(assembly_targets[8])
+simulation.add_moveJ(assembly_targets[9])
+simulation.add_moveJ(assembly_targets[10])
+activate_gripper("top")
+simulation.add_moveJ(assembly_targets[11])
+
 
 
 """
@@ -108,8 +133,6 @@ for i in range(len(assembly_targets)):
     else:
         simulation.add_moveL(assembly_targets[i])
 """
-simulation.set_IO(0, 1)
-simulation.set_IO(1, 1)
 
 """
 bottom_target_approach = simulation.add_target(bottom_assembly_approach, "BottomAssemblyApproach", setAsjoint=False)

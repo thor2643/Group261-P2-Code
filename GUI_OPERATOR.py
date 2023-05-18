@@ -333,13 +333,8 @@ def Refill(): #Moves to Refill page.
     page = pages[count]
     page.pack()
     entry_eq_0()
-    root.after(5000, Update_Over_Time)
+    root.after(5000, Update)
     
-def Update_Over_Time(): # Updates Statuslist, page_1 text and the values in Dispensor_number.
-    Read_CSV()
-    Update_Numbers()
-    Check_If_Refill_Needed()
-    print('Updated')
     
 def Start(): #is only called at start. Moves to next page and gets values from StatusList.
     global count
@@ -359,7 +354,25 @@ def Start_Update(): #Moves to next page and updates it.
     Start()
     Update_Numbers()
     Check_If_Refill_Needed()
-    page_1.after(10000, Update_Over_Time)
+    Update()
+    
+def Update():
+    global Dispensor_number
+    if count==1:
+        print(Dispensor_number)
+        Dispensor_number=Read_CSV()
+        print(Dispensor_number)
+        Update_Numbers()
+        Check_If_Refill_Needed()
+        print('Updated')
+        root.after(10000, Update)
+        return Dispensor_number
+    else:
+        print('still runs')
+        root.after(10000,Update)
+        return Dispensor_number
+        
+        
     
 def Move_back_page(): #Goes back to page_1, and updates the text etc..
     global count
@@ -410,14 +423,12 @@ def Add(): # when Add_btn is pushed the following is happening.
     Move_back_page()
     Clear_Entry()
     Check_If_Refill_Needed()
-    root.after(10000, Update_Over_Time)
     
 def Rem(): # when Rem_btn is pushed the following is happening.
     Calculate(2)
     Move_back_page()
     Clear_Entry()
     Check_If_Refill_Needed()
-    root.after(10000, Update_Over_Time)
     
 def Check_If_Refill_Needed(): #updates the text on page_1, checs if any dispensor needs to be refilled.
     if Dispensor_number[0] < 5:
@@ -426,7 +437,7 @@ def Check_If_Refill_Needed(): #updates the text on page_1, checs if any dispenso
     else:
         PCB_refill.configure(fg='white')
     
-    if Dispensor_number[1] < 41:
+    if Dispensor_number[1] < 47:
         Fuse_refill.configure(fg='red')
         Fuse_refill.pack()
     else:
