@@ -87,7 +87,11 @@ class TrajectoryPlanner:
                 vel_vector = (d_pose/d_pose_norm)*vel
 
                 def moveL(t):
-                    return pose1[0:3]+vel_vector*t
+                    a2 = (3/tf**2)*(pose2[0:3]-pose1[0:3])-(2/tf)*start_vel-(1/tf)*end_vel
+                    a3 = (-2/tf**3)*(pose2[0:3]-pose1[0:3])+(1/(tf**2))*(end_vel+start_vel)
+                    
+                    return pose1[0:3]+start_vel*t+a2*(t**2)+a3*(t**3)
+                    #return pose1[0:3]+vel_vector*t
 
 
 

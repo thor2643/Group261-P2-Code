@@ -49,8 +49,8 @@ start_angle = -38
 
 names_angles = [[names[0], start_angle],
                 [names[1], start_angle + d_fuse_angle],
-                [names[2], start_angle + 2*d_fuse_angle-1],
-                [names[3], start_angle + 3*d_fuse_angle-1]]
+                [names[2], start_angle + 2*d_fuse_angle],
+                [names[3], start_angle + 3*d_fuse_angle]]
 
 simulation.set_in_circular_position(names_angles, radius=radius)
 

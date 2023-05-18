@@ -30,15 +30,15 @@ l2, t0, tf = UR5.get2PointMoveLFunction(pose1, pose2, 100, 0, 0)
 
 #Parabolic blend on two vector poses (in this case only the position)
 #Minimum required accelearation is automatically calculated and used, but specific acceleration can also be given
-l3, t0, tf = UR5.get2PointMoveLFunction(pose1[0:3], pose2[0:3], 0, 0, 10 ,"pb")
+l3, t0, tf = UR5.get2PointMoveLFunction(pose1[0:3], pose2[0:3], 0, 0, 10 ,"cb")
 
 t_example = 10
 #print(l3(tf))
-#UR5.plot2DTrajectory(l3, t0, tf)
-#UR5.plot3DTrajectory(l3, t0, tf)
+UR5.plot2DTrajectory(l3, t0, tf)
+UR5.plot3DTrajectory(l3, t0, tf)
 
 #Cubic polynomial with end velocity = 50 for each coordinate
-l4, t0, tf = UR5.get2PointMoveLFunction(pose1[0:3], pose2[0:3], 0, 0, 10, "cb")#, 0, np.array([50, -50, 50]))
+l4, t0, tf = UR5.get2PointMoveLFunction(pose1[0:3], pose2[0:3], 0, 0, 10, "pb")#, 0, np.array([50, -50, 50]))
 
 t_example = 10
 #print(l4(tf))
