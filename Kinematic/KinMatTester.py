@@ -1,7 +1,7 @@
 import Kinematics as km
 import KinematicsSilas as kms
-import sympy as sp
 import math
+import sympy as sp
 
 UR5Kin = km.Kinematics()
 UR5KinS = kms.KinematicsSilas()
