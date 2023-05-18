@@ -117,6 +117,7 @@ def Page_buttons():
 #funktions
 def move_next_page():
     global count
+    next_btn.configure(text='Next')
     if count==5:
         for p in pages:
             p.pack_forget()
@@ -168,6 +169,7 @@ def move_back_page():
     if count== 4:
         next_btn.configure(text='Next')
         back_btn.pack(side=tk.LEFT)
+        
 
     if not count ==  0:
 
@@ -179,6 +181,10 @@ def move_back_page():
         page.pack(pady=100)
         Page_buttons()
         return count
+    
+    if count==3:
+        next_btn.configure(text='Done')
+        back_btn.pack(side=tk.LEFT)
         
 def set_black():
     global count
@@ -226,7 +232,7 @@ def Get_Data():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     # Connect the socket to the server's IP address and port
-    server_address = ('192.168.137.205',53432)
+    server_address = ('192.168.137.245',53432)
     sock.connect(server_address)
 
     try:
