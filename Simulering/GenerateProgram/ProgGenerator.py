@@ -8,7 +8,7 @@ import TrajectoryPlanning as tp
 
 #Setup RoboDK
 RDK = robodk.robolink.Robolink()
-robot = RDK.Item('UR5')      # retrieve the robot by name
+robot = RDK.Item('UR5')                # retrieve the robot by name
 robot_base = RDK.Item('UR5 Base')      # retrieve the robot by name
 ref_frame = RDK.Item('UR5 Base')
 
@@ -16,30 +16,30 @@ ref_frame = RDK.Item('UR5 Base')
 TPPlanner = tp.TrajectoryPlanner()
 
 #Define the two positions
-#joints1 = np.array([34.98, -89.39, 125.73, -59.25, 74.26, 186.54, 0, 0])
-#joints2 = np.array([60.86, -89.04, 125.54, -59.39, 74.32, 96.51, 0, 0])
-#joints3 = np.array([85.58, -88.4, 126.52, -61.02, 74.26, 6.54, 0, 0])
-#joints4 = np.array([111.38, -89.59, 125.57, -58.89, 74.26, -83.46, 0, 0])
+joints1 = np.array([34.98, -89.5, 125.5, -59, 74.25, 186.5, 0, 0])
+joints2 = np.array([60.86, -89.5, 125.5, -59, 74.25, 96.5, 0, 0])
+joints3 = np.array([85.58, -88.5, 125.5, -59, 74.25, 6.5, 0, 0])
+joints4 = np.array([111.38, -89.5, 125.5, -59, 74.25, -83.5, 0, 0])
 
 #target_joints = [joints1, joints2, joints3, joints4]
 
 
-joints1 = np.array([111.38, -89.59, 125.57, -58.89, 74.26, -83.46, 0, 0])
-joints2 = np.array([136, -89.04, 125.54, -59.39, 74.32, -173.5, 0, 0])
+#joints1 = np.array([111.38, -89.59, 125.57, -58.89, 74.26, -83.46, 0, 0])
+#joints2 = np.array([136, -89.04, 125.54, -59.39, 74.32, -173.5, 0, 0])
 
 target_joints = [joints1, joints2]
 
-joint_targets1 = TPPlanner.getJointPath(joints1, joints2, 10)
-#joint_targets2 = TPPlanner.getJointPath(joints2, joints3, 10)
-#joint_targets3 = TPPlanner.getJointPath(joints3, joints4, 10)
+joint_targets1 = TPPlanner.getJointPath(joints1, joints2, 15)
+joint_targets2 = TPPlanner.getJointPath(joints2, joints3, 15)
+joint_targets3 = TPPlanner.getJointPath(joints3, joints4, 15)
 
-target_joint_lists = [joint_targets1] #, joint_targets2, joint_targets3]
+target_joint_lists = [joint_targets1, joint_targets2, joint_targets3]
 
 idx = 0
 
 for joints_list in target_joint_lists:
     for joint in joints_list:
-        target = RDK.AddTarget(f'T{idx+200}', ref_frame)
+        target = RDK.AddTarget(f'T{idx}', ref_frame)
         target = target.setJoints(list(joint))
         target.setAsJointTarget()
         idx+=1
@@ -53,7 +53,7 @@ program.setPoseTool(robot.PoseTool())
 
 #Divide the trajectory into 50 points
 for i in range(idx):
-    target = RDK.Item(f'T{i+200}')
+    target = RDK.Item(f'T{i}')
 
     #print(target.Pose())
     # Add a linear movement (with the exception of the first point which will be a joint movement)

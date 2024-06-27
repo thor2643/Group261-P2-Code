@@ -23,7 +23,7 @@ names_paths = [["TopDispenser", 'C:/Users/Thor9/OneDrive - Aalborg Universitet/D
 simulation = RoboDKProgram.RoboDKProgram(ref_frame_name="Ref Frame")
 
 #Uncomment to load files from pc
-#simulation.load_dispensers_from_PC(names_paths)
+simulation.load_dispensers_from_PC(names_paths)
 
 #Retrieve items in robodk by name
 names = [name_path[0] for name_path in names_paths]

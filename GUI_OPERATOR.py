@@ -282,6 +282,7 @@ def Write_Csv(component_List): #Updates statusliste. Sets Statuslists to our cha
     
     with open(filename, 'w', newline='') as file:
         writer = csv.writer(file)
+        print(data_Injection)
         writer.writerows(data_Injection)
 
 
