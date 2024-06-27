@@ -7,7 +7,7 @@ cause big energy spikes. Therefore a gripper consisting of four individual gripp
 to the center. This allowed the robot to pick up all the components in a continous rolling motion, which indeed was a very satisfying thing to watch!
 Although the effect on the environmental footprint were minimal, the continous flow in the pick showed great potential in regard to throughput. However, this would require some tweaking and improvements to the
 current robot trajectory as it currently is only as fast as the "classical" approach. Nevertheless, we urge you to take a look at the video "20 phones assembled 100 % success" in the YouTube playlist found by
-following the link [P2-Playlist](https://www.youtube.com/watch?v=s7JXzK1XEYg&list=PLvF0YaCHe3KkmQyWYJX_KTgWdvqXj8dY-&index=5).
+following the link [P2-Playlist](https://www.youtube.com/playlist?list=PLvF0YaCHe3KkmQyWYJX_KTgWdvqXj8dY-).
 
 <img src="Images/FrontPage.png" width="640">
 
@@ -20,7 +20,7 @@ The code setup consist primarily of the 4 parts:
 
 The central hub functions as the link between the robot, the dispensers, the customer GUI and the operator GUI. It takes orders from the customer GUI through a TCP connection and sends the respective order to the arduino controlling
 the dispensers over a serial connection. When receiving an acknowledgement from the arduino the central hub starts an appropriate program on the UR5 also through a TCP connection through RoboDK. Lastly, component
-lists are updated, which the operator GUI uses to alert the operator if the cell is running out of components. The GUI's has also been shown in the [P2-Playlist](https://www.youtube.com/watch?v=s7JXzK1XEYg&list=PLvF0YaCHe3KkmQyWYJX_KTgWdvqXj8dY-&index=5). 
+lists are updated, which the operator GUI uses to alert the operator if the cell is running out of components. The GUI's has also been shown in the [P2-Playlist](https://www.youtube.com/playlist?list=PLvF0YaCHe3KkmQyWYJX_KTgWdvqXj8dY-). 
 
 Beside the physical cell, a digital twin of the cell has been set up in RoboDK to allow for offline development and testing ideas before running them on the actual robot cell. Together, with a range of helper scripts
 the programs could be generated automatically based on the kinematics learned thorughout the semester. 
