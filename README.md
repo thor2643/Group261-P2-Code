@@ -24,6 +24,7 @@ lists are updated, which the operator GUI uses to alert the operator if the cell
 
 Beside the physical cell, a digital twin of the cell has been set up in RoboDK to allow for offline development and testing ideas before running them on the actual robot cell. Together, with a range of helper scripts
 the programs could be generated automatically based on the kinematics learned thorughout the semester. 
+
 <img src="Images/Robot cell in RoboDK.png" width="640">
 
 ## Contributors
